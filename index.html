@@ -235,6 +235,7 @@ tbody tr:hover td{background:#fafafa;}
       <button class="tab" onclick="showTab('devolucoes',this)">↩️ Devoluções</button>
       <button class="tab" onclick="showTab('movimentar',this)">📥 Movimentar</button>
       <button class="tab" onclick="showTab('historico',this)">🕐 Histórico</button>
+      <button class="tab" onclick="showTab('caixa',this)">💰 Caixa</button>
       <button class="tab" onclick="showTab('relatorio',this)">📊 Relatório</button>
       <button class="tab" onclick="showTab('calculadora',this)">🧮 Calculadora</button>
       <button class="tab" onclick="showTab('configuracoes',this)">⚙️ Config.</button>
@@ -332,12 +333,10 @@ tbody tr:hover td{background:#fafafa;}
       </div>
       <div class="sec-header">🕐 Vendas recentes</div>
       <div class="table-wrap">
-        <table><thead><tr><th>Data</th><th>Cliente</th><th>Itens</th><th>Pagamento</th><th>Parcelas</th><th>Pontos</th><th>Total</th></tr></thead>
+        <table><thead><tr><th>Data</th><th>Cliente</th><th>Itens</th><th>Pagamento</th><th>Parcelas</th><th>Pontos</th><th>Total</th><th></th></tr></thead>
         <tbody id="tabela-vendas"></tbody></table>
       </div>
-    </div>
-
-    <div id="tab-orcamentos" class="section">
+    </div> class="section">
       <div class="sec-header">📝 Orçamentos pendentes</div>
       <div class="table-wrap">
         <table><thead><tr><th>Data</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Ações</th></tr></thead>
@@ -379,6 +378,49 @@ tbody tr:hover td{background:#fafafa;}
     <div id="tab-historico" class="section">
       <div class="sec-header">🕐 Todas as movimentações</div>
       <div class="table-wrap" id="historico-lista"></div>
+    </div>
+
+    <!-- CAIXA -->
+    <div id="tab-caixa" class="section">
+      <!-- Estado: caixa fechado -->
+      <div id="caixa-fechado">
+        <div class="panel">
+          <div class="panel-title">💰 Abrir caixa do dia</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Informe o saldo inicial (dinheiro em caixa no início do dia).</p>
+          <div class="form-row" style="max-width:400px">
+            <div class="field"><label>💵 Saldo inicial (R$)</label><input id="caixa-saldo-inicial" type="number" min="0" step="0.01" placeholder="0,00"></div>
+            <div class="field"><label>📝 Observação</label><input id="caixa-obs-abertura" placeholder="Ex: Troco inicial"></div>
+          </div>
+          <div class="btn-row"><button class="btn success" onclick="abrirCaixa()">✅ Abrir caixa</button></div>
+          <div id="caixa-fb-abertura" class="feedback"></div>
+        </div>
+        <div id="historico-caixas-wrap">
+          <div class="sec-header">🕐 Caixas anteriores</div>
+          <div class="table-wrap"><div id="historico-caixas"></div></div>
+        </div>
+      </div>
+
+      <!-- Estado: caixa aberto -->
+      <div id="caixa-aberto" style="display:none">
+        <div class="cards" id="caixa-cards"></div>
+        <div class="panel">
+          <div class="panel-title">📊 Movimentações do caixa</div>
+          <div class="table-wrap" style="margin-bottom:0;box-shadow:none">
+            <table><thead><tr><th>Hora</th><th>Descrição</th><th>Tipo</th><th>Valor</th></tr></thead>
+            <tbody id="caixa-movs"></tbody></table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">🔒 Fechar caixa</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Confira o resumo e informe o saldo final em caixa.</p>
+          <div class="form-row" style="max-width:400px">
+            <div class="field"><label>💵 Saldo final em caixa (R$)</label><input id="caixa-saldo-final" type="number" min="0" step="0.01" placeholder="0,00"></div>
+            <div class="field"><label>📝 Observação</label><input id="caixa-obs-fechamento" placeholder="Ex: Sangria realizada"></div>
+          </div>
+          <div class="btn-row"><button class="btn danger" onclick="fecharCaixa()">🔒 Fechar caixa</button></div>
+          <div id="caixa-fb-fechamento" class="feedback"></div>
+        </div>
+      </div>
     </div>
 
     <div id="tab-relatorio" class="section">
@@ -843,9 +885,16 @@ tbody tr:hover td{background:#fafafa;}
     dados.vendas.unshift({id:uid(),data:data,clienteId:cliId,cliente:cliNome,pagto:pagto,parcelas:parcelas,itens:itensVenda.slice(),total:total,pontos:pontos});
     if(dados.vendas.length>500)dados.vendas=dados.vendas.slice(0,500);
     dados.historico.unshift({id:uid(),tipo:'venda',prodNome:itensVenda.length===1?itensVenda[0].nome:itensVenda.length+' produtos',qty:itensVenda.reduce(function(s,i){return s+i.qty;},0),total:total,cliente:cliNome,data:data});
+    // Registra no caixa se estiver aberto
+    registrarMovCaixa('Venda — '+(cliNome!=='—'?cliNome:'Consumidor final'), total, 'entrada');
+    var vendaSalva={id:uid(),data:data,clienteId:cliId,cliente:cliNome,pagto:pagto,parcelas:parcelas,itens:itensVenda.slice(),total:total,pontos:pontos};
+    dados.vendas[0]=vendaSalva;
     await salvar();itensVenda=[];renderItens();document.getElementById('v-cliente-sel').value='';
     renderVendaSelect();renderClienteSelect();renderVendas();
-    showFb('venda-feedback','✅ Venda finalizada! Total: '+brl(total)+(cliId?' · +'+pontos+' pts':''),'ok');
+    var msg='✅ Venda finalizada! Total: '+brl(total)+(cliId?' · +'+pontos+' pts':'');
+    showFb('venda-feedback',msg,'ok');
+    // Pergunta se quer imprimir recibo
+    if(confirm('Venda finalizada! Deseja imprimir o recibo?'))imprimirRecibo(vendaSalva);
   };
   window.salvarOrcamento=async function(){
     if(!itensVenda.length){showFb('venda-feedback','Adicione pelo menos um item.','err');return;}
@@ -866,7 +915,8 @@ tbody tr:hover td{background:#fafafa;}
         +'<td style="font-size:12px">'+v.itens.map(function(i){return i.nome+' x'+i.qty;}).join(', ')+'</td>'
         +'<td><span class="badge pagto">'+v.pagto+'</span></td><td style="font-size:12px">'+parc+'</td>'
         +'<td style="color:var(--orange);font-size:12px">'+(v.pontos?'⭐+'+v.pontos:'—')+'</td>'
-        +'<td><strong>'+brl(v.total)+'</strong></td></tr>';
+        +'<td><strong>'+brl(v.total)+'</strong></td>'
+        +'<td><button class="btn btn-sm" onclick=\'imprimirRecibo('+JSON.stringify(v).replace(/'/g,"\\'")+')\'  title="Imprimir recibo">🧾</button></td></tr>';
     }).join('');
   }
 
@@ -1016,6 +1066,124 @@ tbody tr:hover td{background:#fafafa;}
     win.document.write('</body></html>');win.document.close();setTimeout(function(){win.print();},500);
   };
 
+  // ── RECIBO ────────────────────────────────────────────
+  function imprimirRecibo(venda){
+    var emp=usuarioAtual;
+    var win=window.open('','_blank');
+    var parc=venda.parcelas&&venda.parcelas>1?venda.parcelas+'x de '+brl(venda.total/venda.parcelas):'À vista';
+    win.document.write('<html><head><title>Recibo</title><style>');
+    win.document.write('*{box-sizing:border-box;margin:0;padding:0;}body{font-family:system-ui,sans-serif;padding:1.5rem;max-width:380px;margin:0 auto;color:#111;}');
+    win.document.write('.logo{text-align:center;margin-bottom:1rem;}.logo h1{font-size:22px;font-weight:800;color:#6366f1;}.logo p{font-size:11px;color:#6b7280;}');
+    win.document.write('.divider{border:none;border-top:1px dashed #d1d5db;margin:12px 0;}');
+    win.document.write('.info{font-size:12px;margin-bottom:4px;color:#374151;}');
+    win.document.write('table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0;}');
+    win.document.write('th{text-align:left;font-size:11px;color:#6b7280;padding:4px 0;border-bottom:1px solid #e5e7eb;}');
+    win.document.write('td{padding:5px 0;border-bottom:1px solid #f3f4f6;vertical-align:top;}');
+    win.document.write('.total-row{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin-top:12px;padding-top:8px;border-top:2px solid #111;}');
+    win.document.write('.footer{text-align:center;font-size:11px;color:#9ca3af;margin-top:16px;}');
+    win.document.write('@media print{body{padding:0;}}');
+    win.document.write('</style></head><body>');
+    win.document.write('<div class="logo">');
+    win.document.write('<h1>📦 StockPro</h1>');
+    if(emp.fantasia||emp.empresa) win.document.write('<p><strong>'+(emp.fantasia||emp.empresa)+'</strong></p>');
+    if(emp.empresa&&emp.fantasia) win.document.write('<p>'+emp.empresa+'</p>');
+    if(emp.cnpj) win.document.write('<p>CNPJ: '+emp.cnpj+'</p>');
+    win.document.write('</div>');
+    win.document.write('<hr class="divider">');
+    win.document.write('<p class="info"><strong>Data:</strong> '+venda.data+'</p>');
+    win.document.write('<p class="info"><strong>Cliente:</strong> '+(venda.cliente&&venda.cliente!=='—'?venda.cliente:'Consumidor final')+'</p>');
+    win.document.write('<p class="info"><strong>Pagamento:</strong> '+venda.pagto+' — '+parc+'</p>');
+    win.document.write('<hr class="divider">');
+    win.document.write('<table><thead><tr><th>Produto</th><th style="text-align:center">Qtd.</th><th style="text-align:right">Unit.</th><th style="text-align:right">Total</th></tr></thead><tbody>');
+    venda.itens.forEach(function(it){
+      win.document.write('<tr><td>'+it.nome+'</td><td style="text-align:center">'+it.qty+'</td><td style="text-align:right">'+brl(it.preco)+'</td><td style="text-align:right">'+brl(it.preco*it.qty)+'</td></tr>');
+    });
+    win.document.write('</tbody></table>');
+    win.document.write('<div class="total-row"><span>TOTAL</span><span>'+brl(venda.total)+'</span></div>');
+    if(venda.pontos) win.document.write('<p style="font-size:12px;color:#f59e0b;margin-top:8px;text-align:center">⭐ +'+venda.pontos+' pontos de fidelidade</p>');
+    win.document.write('<hr class="divider">');
+    win.document.write('<div class="footer"><p>Obrigado pela preferência!</p><p style="margin-top:4px">StockPro · Sistema de Gestão</p></div>');
+    win.document.write('</body></html>');
+    win.document.close();
+    setTimeout(function(){win.print();},400);
+  }
+
+  // ── CAIXA ─────────────────────────────────────────────
+  function getCaixaAberto(){
+    return dados.caixas&&dados.caixas.find(function(c){return c.status==='aberto';});
+  }
+
+  function renderCaixa(){
+    if(!dados.caixas)dados.caixas=[];
+    var aberto=getCaixaAberto();
+    document.getElementById('caixa-fechado').style.display=aberto?'none':'block';
+    document.getElementById('caixa-aberto').style.display=aberto?'block':'none';
+    if(aberto)renderCaixaAberto(aberto);
+    renderHistoricoCaixas();
+  }
+
+  function renderCaixaAberto(caixa){
+    var movs=caixa.movimentacoes||[];
+    var totalEntradas=movs.filter(function(m){return m.tipo==='entrada';}).reduce(function(s,m){return s+m.valor;},0);
+    var totalSaidas=movs.filter(function(m){return m.tipo==='saida';}).reduce(function(s,m){return s+m.valor;},0);
+    var saldoAtual=caixa.saldoInicial+totalEntradas-totalSaidas;
+    document.getElementById('caixa-cards').innerHTML=
+      '<div class="card"><div class="card-icon green">💵</div><div class="card-label">Saldo inicial</div><div class="card-value" style="font-size:18px">'+brl(caixa.saldoInicial)+'</div></div>'+
+      '<div class="card"><div class="card-icon green">📈</div><div class="card-label">Total entradas</div><div class="card-value" style="font-size:18px">'+brl(totalEntradas)+'</div></div>'+
+      '<div class="card"><div class="card-icon red">📉</div><div class="card-label">Total saídas</div><div class="card-value" style="font-size:18px">'+brl(totalSaidas)+'</div></div>'+
+      '<div class="card"><div class="card-icon purple">💰</div><div class="card-label">Saldo atual</div><div class="card-value" style="font-size:18px">'+brl(saldoAtual)+'</div></div>'+
+      '<div class="card"><div class="card-icon blue">🧾</div><div class="card-label">Abertura</div><div class="card-value" style="font-size:13px;margin-top:4px">'+caixa.dataAbertura+'</div></div>';
+    var tb=document.getElementById('caixa-movs');
+    if(!movs.length){tb.innerHTML='<tr><td colspan="4"><div class="empty" style="padding:1rem">Nenhuma movimentação ainda</div></td></tr>';return;}
+    tb.innerHTML=movs.slice().reverse().map(function(m){
+      return '<tr><td style="font-size:12px;color:var(--text2)">'+m.hora+'</td><td>'+m.descricao+'</td>'
+        +'<td><span class="badge '+(m.tipo==='entrada'?'ok':'low')+'">'+(m.tipo==='entrada'?'↑ Entrada':'↓ Saída')+'</span></td>'
+        +'<td style="font-weight:700;color:'+(m.tipo==='entrada'?'var(--green)':'var(--red)')+'">'+( m.tipo==='entrada'?'+':'-')+brl(m.valor)+'</td></tr>';
+    }).join('');
+  }
+
+  function renderHistoricoCaixas(){
+    var el=document.getElementById('historico-caixas');
+    var fechados=(dados.caixas||[]).filter(function(c){return c.status==='fechado';}).slice().reverse();
+    if(!fechados.length){el.innerHTML='<div class="empty"><span class="ico">💰</span>Nenhum caixa fechado ainda</div>';return;}
+    el.innerHTML='<table><thead><tr><th>Abertura</th><th>Fechamento</th><th>Saldo inicial</th><th>Entradas</th><th>Saídas</th><th>Saldo final</th><th>Diferença</th></tr></thead><tbody>'
+      +fechados.map(function(c){
+        var movs=c.movimentacoes||[];
+        var ent=movs.filter(function(m){return m.tipo==='entrada';}).reduce(function(s,m){return s+m.valor;},0);
+        var sai=movs.filter(function(m){return m.tipo==='saida';}).reduce(function(s,m){return s+m.valor;},0);
+        var esperado=c.saldoInicial+ent-sai;
+        var diff=c.saldoFinal-esperado;
+        return '<tr><td style="font-size:12px">'+c.dataAbertura+'</td><td style="font-size:12px">'+c.dataFechamento+'</td>'
+          +'<td>'+brl(c.saldoInicial)+'</td><td style="color:var(--green)">+'+brl(ent)+'</td><td style="color:var(--red)">-'+brl(sai)+'</td>'
+          +'<td><strong>'+brl(c.saldoFinal)+'</strong></td>'
+          +'<td style="color:'+(diff>=0?'var(--green)':'var(--red)')+';font-weight:700">'+(diff>=0?'+':'')+brl(diff)+'</td></tr>';
+      }).join('')+'</tbody></table>';
+  }
+
+  window.abrirCaixa=async function(){
+    var saldo=parseFloat(document.getElementById('caixa-saldo-inicial').value)||0;
+    var obs=document.getElementById('caixa-obs-abertura').value.trim();
+    if(!dados.caixas)dados.caixas=[];
+    dados.caixas.push({id:uid(),status:'aberto',dataAbertura:new Date().toLocaleString('pt-BR'),saldoInicial:saldo,obsAbertura:obs,movimentacoes:[]});
+    await salvar();renderCaixa();
+    document.getElementById('caixa-saldo-inicial').value='';document.getElementById('caixa-obs-abertura').value='';
+  };
+
+  window.fecharCaixa=async function(){
+    var caixa=getCaixaAberto();if(!caixa)return;
+    var saldoFinal=parseFloat(document.getElementById('caixa-saldo-final').value);
+    if(isNaN(saldoFinal)){showFb('caixa-fb-fechamento','Informe o saldo final.','err');return;}
+    var obs=document.getElementById('caixa-obs-fechamento').value.trim();
+    caixa.status='fechado';caixa.dataFechamento=new Date().toLocaleString('pt-BR');caixa.saldoFinal=saldoFinal;caixa.obsFechamento=obs;
+    await salvar();renderCaixa();
+    document.getElementById('caixa-saldo-final').value='';document.getElementById('caixa-obs-fechamento').value='';
+  };
+
+  function registrarMovCaixa(descricao, valor, tipo){
+    var caixa=getCaixaAberto();if(!caixa)return;
+    caixa.movimentacoes.push({id:uid(),hora:new Date().toLocaleTimeString('pt-BR'),descricao:descricao,valor:valor,tipo:tipo});
+  }
+
   window.calcPreco=function(){
     var prod=parseFloat(document.getElementById('c-produto').value)||0,fret=parseFloat(document.getElementById('c-frete').value)||0,outr=parseFloat(document.getElementById('c-outros').value)||0;
     var imp=parseFloat(document.getElementById('c-imposto').value)||0,mkt=parseFloat(document.getElementById('c-marketplace').value)||0,mar=parseFloat(document.getElementById('c-margem').value)||0;
@@ -1074,7 +1242,8 @@ tbody tr:hover td{background:#fafafa;}
         var bk=JSON.parse(e.target.result);
         if(!bk.dados){showFb('cfg-fb3','❌ Arquivo inválido.','err');return;}
         if(!confirm('Isso substituirá todos os seus dados atuais. Deseja continuar?'))return;
-        dados=bk.dados;if(!dados.clientes)dados.clientes=[];if(!dados.orcamentos)dados.orcamentos=[];if(!dados.devolucoes)dados.devolucoes=[];
+        dados=bk.dados;    if(!dados.clientes)dados.clientes=[];
+    if(!dados.caixas)dados.caixas=[];if(!dados.orcamentos)dados.orcamentos=[];if(!dados.devolucoes)dados.devolucoes=[];
         await salvar();renderPainel();showFb('cfg-fb3','✅ Backup importado!','ok');
       }catch(err){showFb('cfg-fb3','❌ Arquivo inválido.','err');}
     };
