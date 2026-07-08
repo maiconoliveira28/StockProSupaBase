@@ -838,6 +838,21 @@ tbody tr:hover td{background:#fafbfc;}
   </div>
 </div>
 
+<!-- PAYWALL -->
+<div class="auth-wrap hidden" id="paywall-wrap">
+  <div class="auth-box" style="text-align:center">
+    <div class="auth-logo">
+      <svg width="56" height="56" viewBox="0 0 44 44" style="margin:0 auto;display:block"><rect x="2" y="2" width="24" height="30" rx="4" fill="url(#lg3)"/><rect x="18" y="12" width="24" height="30" rx="4" fill="#a5b4fc"/><defs><linearGradient id="lg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
+      <h1>StockPro</h1>
+    </div>
+    <h3 id="paywall-titulo" style="margin:8px 0 6px">Assinatura pendente</h3>
+    <p id="paywall-texto" style="font-size:13px;color:var(--text2);margin-bottom:18px;">Para continuar usando o sistema, finalize o pagamento da sua assinatura mensal.</p>
+    <div id="paywall-msg" class="auth-msg"></div>
+    <button class="auth-btn" onclick="regularizarPagamento()">Regularizar pagamento</button>
+    <button class="auth-btn secondary" style="margin-top:8px" onclick="fazerLogout()">Sair</button>
+  </div>
+</div>
+
 <!-- MODAL LEITOR -->
 <div class="modal-overlay hidden" id="modal-leitor">
   <div class="modal" style="max-width:360px;text-align:center">
@@ -910,6 +925,9 @@ tbody tr:hover td{background:#fafbfc;}
   function sbGet(table,query){return fetch(SB_URL+'/rest/v1/'+table+'?'+query,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}).then(function(r){return r.json();});}
   function sbPost(table,body){return fetch(SB_URL+'/rest/v1/'+table,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)}).then(function(r){return r.json();});}
   function sbPatch(table,query,body){return fetch(SB_URL+'/rest/v1/'+table+'?'+query,{method:'PATCH',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)}).then(function(r){return r.json();});}
+  function criarAssinatura(usuarioId,email,nome){
+    return fetch(SB_URL+'/functions/v1/criar-assinatura',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({usuario_id:usuarioId,email:email,nome:nome})}).then(function(r){return r.json();});
+  }
 
   function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
   function brl(v){return 'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
@@ -976,7 +994,14 @@ tbody tr:hover td{background:#fafbfc;}
     try{
       var exist=await sbGet('usuarios','email=eq.'+encodeURIComponent(email)+'&select=id');
       if(exist&&exist.length){showMsg('msg-cadastro','E-mail já cadastrado.','err');hideLoad();return;}
-      var nu=await sbPost('usuarios',{nome:nome,empresa:empresa,fantasia:fantasia,cnpj:cnpj,email:email,senha_hash:hash(senha)});
+      var novoUsuario={nome:nome,empresa:empresa,fantasia:fantasia,cnpj:cnpj,email:email,senha_hash:hash(senha),plano_status:'pendente'};
+      var nu=await sbPost('usuarios',novoUsuario);
+      while(nu&&nu.code&&nu.message){
+        var mColU=nu.message.match(/'([a-zA-Z_]+)'/);
+        if(!mColU||!Object.prototype.hasOwnProperty.call(novoUsuario,mColU[1]))break;
+        delete novoUsuario[mColU[1]];
+        nu=await sbPost('usuarios',novoUsuario);
+      }
       if(!nu||!nu[0]){showMsg('msg-cadastro','Erro ao criar conta.','err');hideLoad();return;}
       var novoDados={usuario_id:nu[0].id,produtos:[],vendas:[],orcamentos:[],devolucoes:[],historico:[],clientes:[],caixas:[],das:[],metas:[],fiados:[]};
       var criado=await sbPost('dados_usuario',novoDados);
@@ -986,8 +1011,17 @@ tbody tr:hover td{background:#fafbfc;}
         delete novoDados[mCol[1]];
         criado=await sbPost('dados_usuario',novoDados);
       }
-      showMsg('msg-cadastro','Conta criada! Faça login.','ok');
       ['c-nome','c-empresa','c-fantasia','c-cnpj','c-email','c-senha','c-senha2'].forEach(function(id){document.getElementById(id).value='';});
+      try{
+        var assinatura=await criarAssinatura(nu[0].id,email,nome);
+        if(assinatura&&assinatura.init_point){
+          showMsg('msg-cadastro','Conta criada! Redirecionando para o pagamento da assinatura...','ok');
+          hideLoad();
+          setTimeout(function(){window.location.href=assinatura.init_point;},1200);
+          return;
+        }
+      }catch(eAssin){}
+      showMsg('msg-cadastro','Conta criada! Faça login para continuar.','ok');
       setTimeout(function(){switchAuthTab('login',document.querySelectorAll('.auth-tab')[0]);},1500);
     }catch(e){showMsg('msg-cadastro','Erro de conexão.','err');}
     hideLoad();
@@ -1041,13 +1075,40 @@ tbody tr:hover td{background:#fafbfc;}
         dados.produtos=res[0].produtos||[];dados.vendas=res[0].vendas||[];dados.orcamentos=res[0].orcamentos||[];
         dados.devolucoes=res[0].devolucoes||[];dados.historico=res[0].historico||[];dados.clientes=res[0].clientes||[];dados.caixas=res[0].caixas||[];dados.das=res[0].das||[];dados.metas=res[0].metas||[];dados.fiados=res[0].fiados||[];
       }
+      var freshUser=await sbGet('usuarios','id=eq.'+user.id+'&select=*');
+      if(freshUser&&freshUser[0]){usuarioAtual=freshUser[0];localStorage.setItem(sessaoKey,JSON.stringify(freshUser[0]));}
     }catch(e){console.error(e);}
     hideLoad();
-    document.getElementById('user-nome-display').textContent=user.nome;
-    atualizarCabecalhoEmpresa(user);
+    if(usuarioAtual.plano_status&&usuarioAtual.plano_status!=='ativo'){
+      document.getElementById('auth-wrap').style.display='none';
+      document.getElementById('app-wrap').style.display='none';
+      mostrarPaywall(usuarioAtual.plano_status);
+      return;
+    }
+    document.getElementById('paywall-wrap').classList.add('hidden');
+    document.getElementById('user-nome-display').textContent=usuarioAtual.nome;
+    atualizarCabecalhoEmpresa(usuarioAtual);
     document.getElementById('auth-wrap').style.display='none';document.getElementById('app-wrap').style.display='block';
     itensVenda=[];renderPainel();
   }
+
+  function mostrarPaywall(status){
+    var titulo=document.getElementById('paywall-titulo'),texto=document.getElementById('paywall-texto');
+    if(status==='cancelado'){titulo.textContent='Assinatura cancelada';texto.textContent='Sua assinatura foi cancelada. Para voltar a usar o sistema, assine novamente.';}
+    else if(status==='atrasado'){titulo.textContent='Pagamento em atraso';texto.textContent='Identificamos um problema no pagamento da sua assinatura. Regularize para continuar usando o sistema.';}
+    else{titulo.textContent='Assinatura pendente';texto.textContent='Finalize o pagamento da sua assinatura mensal para começar a usar o sistema.';}
+    document.getElementById('paywall-msg').style.display='none';
+    document.getElementById('paywall-wrap').classList.remove('hidden');
+  }
+  window.regularizarPagamento=async function(){
+    showLoad();
+    try{
+      var assinatura=await criarAssinatura(usuarioAtual.id,usuarioAtual.email,usuarioAtual.nome);
+      hideLoad();
+      if(assinatura&&assinatura.init_point){window.location.href=assinatura.init_point;}
+      else showMsg('paywall-msg','Não foi possível gerar o link de pagamento. Tente novamente em instantes.','err');
+    }catch(e){hideLoad();showMsg('paywall-msg','Erro de conexão. Tente novamente.','err');}
+  };
 
   // ── CABEÇALHO / LOGO DA EMPRESA ───────────────────────
   function atualizarCabecalhoEmpresa(u){
