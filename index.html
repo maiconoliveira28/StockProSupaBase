@@ -751,6 +751,12 @@ tbody tr:hover td{background:#fafbfc;}
           <div id="cfg-fb1" class="feedback"></div>
         </div>
         <div class="panel">
+          <div class="panel-title"><i data-lucide="credit-card"></i> Assinatura</div>
+          <div id="assinatura-info" style="margin-bottom:14px;"></div>
+          <div class="btn-row" id="assinatura-btns"></div>
+          <div id="cfg-fb7" class="feedback"></div>
+        </div>
+        <div class="panel">
           <div class="panel-title"><i data-lucide="file-check"></i> Configurações MEI</div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:10px 12px;background:var(--surface2);border-radius:var(--radius-sm)">
             <input type="checkbox" id="cfg-mei-ativo" onchange="toggleMeiAtivoUI()" style="width:auto;transform:scale(1.2)">
@@ -927,6 +933,9 @@ tbody tr:hover td{background:#fafbfc;}
   function sbPatch(table,query,body){return fetch(SB_URL+'/rest/v1/'+table+'?'+query,{method:'PATCH',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)}).then(function(r){return r.json();});}
   function criarAssinatura(usuarioId,email,nome){
     return fetch(SB_URL+'/functions/v1/criar-assinatura',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({usuario_id:usuarioId,email:email,nome:nome})}).then(function(r){return r.json();});
+  }
+  function cancelarAssinaturaApi(usuarioId){
+    return fetch(SB_URL+'/functions/v1/cancelar-assinatura',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({usuario_id:usuarioId})}).then(function(r){return r.json();});
   }
 
   function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
@@ -2487,7 +2496,38 @@ tbody tr:hover td{background:#fafbfc;}
     document.getElementById('cfg-fid-nivel-prata').value=fid.niveis[1]?fid.niveis[1].min:500;
     document.getElementById('cfg-fid-nivel-ouro').value=fid.niveis[2]?fid.niveis[2].min:1500;
     document.getElementById('cfg-fid-nivel-diamante').value=fid.niveis[3]?fid.niveis[3].min:5000;
+    renderAssinaturaConfig();
   }
+  function renderAssinaturaConfig(){
+    var info=document.getElementById('assinatura-info'),btns=document.getElementById('assinatura-btns');
+    var status=usuarioAtual.plano_status||'ativo';
+    var labels={ativo:'Ativa',pendente:'Pendente de pagamento',atrasado:'Pagamento atrasado',cancelado:'Cancelada'};
+    var html='<p style="font-size:13px;color:var(--text2);margin-bottom:6px;">Status: <strong>'+(labels[status]||status)+'</strong></p>';
+    if(usuarioAtual.plano_valor)html+='<p style="font-size:13px;color:var(--text2);margin-bottom:6px;">Mensalidade: '+brl(usuarioAtual.plano_valor)+'</p>';
+    if(status==='ativo'&&usuarioAtual.proximo_vencimento)html+='<p style="font-size:13px;color:var(--text2);">Próxima cobrança: '+new Date(usuarioAtual.proximo_vencimento+'T00:00:00').toLocaleDateString('pt-BR')+'</p>';
+    info.innerHTML=html;
+    btns.innerHTML='';
+    if(usuarioAtual.mp_preapproval_id&&(status==='ativo'||status==='atrasado')){
+      btns.innerHTML='<button class="btn danger" onclick="cancelarAssinatura()"><i data-lucide="x-circle"></i> Cancelar assinatura</button>';
+      if(window.lucide)lucide.createIcons();
+    }
+  }
+  window.cancelarAssinatura=async function(){
+    if(!confirm('Tem certeza que deseja cancelar sua assinatura? Você perderá o acesso ao sistema imediatamente e não será mais cobrado.'))return;
+    showLoad();
+    try{
+      var res=await cancelarAssinaturaApi(usuarioAtual.id);
+      hideLoad();
+      if(res&&res.ok){
+        usuarioAtual.plano_status='cancelado';
+        localStorage.setItem(sessaoKey,JSON.stringify(usuarioAtual));
+        document.getElementById('app-wrap').style.display='none';
+        mostrarPaywall('cancelado');
+      }else{
+        showFb('cfg-fb7','Não foi possível cancelar agora. Tente novamente em instantes.','err');
+      }
+    }catch(e){hideLoad();showFb('cfg-fb7','Erro de conexão.','err');}
+  };
   window.salvarPerfil=async function(){
     var nome=document.getElementById('cfg-nome').value.trim(),empresa=document.getElementById('cfg-empresa').value.trim();
     if(!nome||!empresa){showFb('cfg-fb1','Nome e razão social obrigatórios.','err');return;}
