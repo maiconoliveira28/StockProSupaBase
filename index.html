@@ -95,12 +95,8 @@ i[data-lucide],svg.lucide{width:18px;height:18px;stroke-width:2;flex-shrink:0;}
 .tab.child i,.tab.child svg{width:14px;height:14px;}
 .nav-group-label{font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);margin:14px 12px 4px;}
 .nav-group-label:first-child{margin-top:2px;}
-.nav-parent{display:flex;align-items:center;gap:2px;}
-.nav-parent .tab{flex:1;}
-.nav-chevron{background:none;border:none;color:var(--text3);cursor:pointer;padding:6px 8px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:transform 0.15s;flex-shrink:0;}
-.nav-chevron:hover{background:var(--surface2);}
-.nav-chevron i,.nav-chevron svg{width:14px;height:14px;}
-.nav-chevron.open{transform:rotate(180deg);}
+.chevron-ic{margin-left:auto;width:14px!important;height:14px!important;flex-shrink:0;opacity:0.55;transition:transform 0.15s;}
+.tab.open .chevron-ic{transform:rotate(180deg);}
 .nav-children{display:none;}
 .nav-children.open{display:block;}
 
@@ -324,24 +320,19 @@ tbody tr:hover td{background:#fafbfc;}
       <nav class="sidebar-nav">
         <div class="nav-group-label">Principal</div>
         <button class="tab active" id="navbtn-painel" onclick="showTab('painel',this)"><i data-lucide="layout-dashboard"></i>Painel</button>
-        <div class="nav-parent">
-          <button class="tab" id="navbtn-vendas" onclick="showTab('vendas',this)"><i data-lucide="shopping-cart"></i>Nova venda</button>
-          <button class="nav-chevron" id="navchevron-vendas" onclick="toggleNavChildren('vendas',this,event)"><i data-lucide="chevron-down"></i></button>
-        </div>
+        <button class="tab" id="navbtn-vendas" onclick="toggleNavChildren('vendas')"><i data-lucide="shopping-cart"></i>Nova venda<i data-lucide="chevron-down" class="chevron-ic"></i></button>
         <div class="nav-children" id="navchildren-vendas">
-          <button class="tab child" onclick="navSubTab('vendas','devolucao')"><i data-lucide="rotate-ccw"></i>Devolução</button>
+          <button class="tab child" id="navchild-vendas-nova" onclick="navSubTab('vendas','nova')"><i data-lucide="receipt"></i>Registrar venda</button>
+          <button class="tab child" id="navchild-vendas-devolucao" onclick="navSubTab('vendas','devolucao')"><i data-lucide="rotate-ccw"></i>Devolução</button>
         </div>
         <button class="tab" onclick="showTab('clientes',this)"><i data-lucide="users"></i>Clientes</button>
         <button class="tab" onclick="showTab('orcamentos',this)"><i data-lucide="file-text"></i>Orçamentos</button>
 
         <div class="nav-group-label">Estoque</div>
-        <div class="nav-parent">
-          <button class="tab" id="navbtn-produtos" onclick="showTab('produtos',this)"><i data-lucide="package"></i>Produtos</button>
-          <button class="nav-chevron" id="navchevron-produtos" onclick="toggleNavChildren('produtos',this,event)"><i data-lucide="chevron-down"></i></button>
-        </div>
+        <button class="tab" id="navbtn-produtos" onclick="toggleNavChildren('produtos')"><i data-lucide="package"></i>Produtos<i data-lucide="chevron-down" class="chevron-ic"></i></button>
         <div class="nav-children" id="navchildren-produtos">
-          <button class="tab child" onclick="navSubTab('produtos','produtos')"><i data-lucide="list"></i>Gerenciar produtos</button>
-          <button class="tab child" onclick="navSubTab('produtos','movimentar')"><i data-lucide="arrow-down-circle"></i>Movimentar estoque</button>
+          <button class="tab child" id="navchild-produtos-produtos" onclick="navSubTab('produtos','produtos')"><i data-lucide="list"></i>Gerenciar produtos</button>
+          <button class="tab child" id="navchild-produtos-movimentar" onclick="navSubTab('produtos','movimentar')"><i data-lucide="arrow-down-circle"></i>Movimentar estoque</button>
         </div>
 
         <div class="nav-group-label">Financeiro</div>
@@ -376,10 +367,6 @@ tbody tr:hover td{background:#fafbfc;}
 
       <!-- PRODUTOS -->
       <div id="tab-produtos" class="section">
-        <div class="pill-tabs" style="max-width:360px">
-          <button class="pill-tab active" id="subtab-produtos" onclick="mostrarSubProduto('produtos',this)">Produtos</button>
-          <button class="pill-tab" id="subtab-movimentar" onclick="mostrarSubProduto('movimentar',this)">Movimentar</button>
-        </div>
         <div id="produto-sub-produtos">
         <div class="panel">
           <div class="panel-title"><i data-lucide="plus"></i> <span id="form-title">Cadastrar novo produto</span></div>
@@ -458,10 +445,6 @@ tbody tr:hover td{background:#fafbfc;}
 
       <!-- VENDAS -->
       <div id="tab-vendas" class="section">
-        <div class="pill-tabs" style="max-width:360px">
-          <button class="pill-tab active" id="subtab-nova-venda" onclick="mostrarSubVenda('nova',this)">Nova venda</button>
-          <button class="pill-tab" id="subtab-devolucao" onclick="mostrarSubVenda('devolucao',this)">Devolução</button>
-        </div>
         <div id="venda-sub-nova">
         <div class="panel">
           <div class="panel-title"><i data-lucide="receipt"></i> Registrar venda</div>
@@ -1383,9 +1366,9 @@ tbody tr:hover td{background:#fafbfc;}
     document.getElementById('tab-'+t).classList.add('active');if(btn)btn.classList.add('active');
     atualizarBreadcrumb(t);
     if(t==='vendas'||t==='produtos'){
-      var childWrap=document.getElementById('navchildren-'+t),chevron=document.getElementById('navchevron-'+t);
+      var childWrap=document.getElementById('navchildren-'+t),parentBtn=document.getElementById('navbtn-'+t);
       if(childWrap)childWrap.classList.add('open');
-      if(chevron)chevron.classList.add('open');
+      if(parentBtn)parentBtn.classList.add('open');
     }
     if(t==='painel')renderPainel();
     if(t==='produtos'){renderProdutos();renderMovSelect();}
@@ -1402,22 +1385,18 @@ tbody tr:hover td{background:#fafbfc;}
     if(t==='configuracoes')carregarPerfil();
     toggleSidebar(false);
   };
-  window.mostrarSubVenda=function(tipo,btn){
-    document.querySelectorAll('#tab-vendas .pill-tab').forEach(function(b){b.classList.remove('active');});
-    btn.classList.add('active');
+  function mostrarSubVenda(tipo){
     document.getElementById('venda-sub-nova').style.display=tipo==='nova'?'block':'none';
     document.getElementById('venda-sub-devolucao').style.display=tipo==='devolucao'?'block':'none';
     atualizarBreadcrumb('vendas',tipo==='devolucao'?'Devolução':null);
     if(tipo==='devolucao'){renderDevolucaoSelect();renderHistoricoDevolucoes();}
-  };
-  window.mostrarSubProduto=function(tipo,btn){
-    document.querySelectorAll('#tab-produtos .pill-tab').forEach(function(b){b.classList.remove('active');});
-    btn.classList.add('active');
+  }
+  function mostrarSubProduto(tipo){
     document.getElementById('produto-sub-produtos').style.display=tipo==='produtos'?'block':'none';
     document.getElementById('produto-sub-movimentar').style.display=tipo==='movimentar'?'block':'none';
     atualizarBreadcrumb('produtos',tipo==='movimentar'?'Movimentar estoque':null);
     if(tipo==='movimentar')renderMovSelect();
-  };
+  }
 
   // ── SIDEBAR (mobile) ─────────────────────────────────
   window.toggleSidebar=function(open){
@@ -1451,21 +1430,23 @@ tbody tr:hover td{background:#fafbfc;}
     var who=document.getElementById('topbar-who');
     if(who&&!who.contains(e.target))fecharUserMenu();
   });
-  window.toggleNavChildren=function(grupo,btn,e){
-    if(e)e.stopPropagation();
+  window.toggleNavChildren=function(grupo){
     var wrap=document.getElementById('navchildren-'+grupo);
+    var btn=document.getElementById('navbtn-'+grupo);
     var abrir=!wrap.classList.contains('open');
     wrap.classList.toggle('open',abrir);
-    btn.classList.toggle('open',abrir);
+    if(btn)btn.classList.toggle('open',abrir);
   };
   window.navSubTab=function(secao,sub){
     if(secao==='vendas'){
-      showTab('vendas',document.getElementById('navbtn-vendas'));
-      mostrarSubVenda(sub,document.getElementById(sub==='devolucao'?'subtab-devolucao':'subtab-nova-venda'));
+      showTab('vendas',null);
+      mostrarSubVenda(sub);
     }else if(secao==='produtos'){
-      showTab('produtos',document.getElementById('navbtn-produtos'));
-      mostrarSubProduto(sub,document.getElementById(sub==='movimentar'?'subtab-movimentar':'subtab-produtos'));
+      showTab('produtos',null);
+      mostrarSubProduto(sub);
     }
+    var parentBtn=document.getElementById('navbtn-'+secao);if(parentBtn)parentBtn.classList.add('active');
+    var childBtn=document.getElementById('navchild-'+secao+'-'+sub);if(childBtn)childBtn.classList.add('active');
   };
 
   // ── PAINEL ────────────────────────────────────────────
@@ -1877,6 +1858,8 @@ tbody tr:hover td{background:#fafbfc;}
     editVendaId=id;editVendaOriginal=v;
     itensVenda=v.itens.map(function(i){return Object.assign({},i);});
     showTab('vendas',document.getElementById('navbtn-vendas'));
+    mostrarSubVenda('nova');
+    var navChildNova=document.getElementById('navchild-vendas-nova');if(navChildNova)navChildNova.classList.add('active');
     document.getElementById('v-data').value=stringParaDataVenda(v.data);
     document.getElementById('v-cliente-sel').value=v.clienteId||'';
     document.getElementById('v-pagto').value=v.pagto;
