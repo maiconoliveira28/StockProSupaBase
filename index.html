@@ -10,20 +10,20 @@
 :root{
   --bg:#f8fafc;--surface:#fff;--surface2:#f8fafc;--border:rgba(15,23,42,0.07);
   --text:#0f172a;--text2:#64748b;--text3:#94a3b8;
-  --primary:#6366f1;--primary-dark:#4338ca;--primary-light:#eef2ff;
+  --primary:#0E7C6B;--primary-dark:#0A5A4D;--primary-light:#E7F4F1;
   --green:#10b981;--green-light:#d1fae5;
   --red:#ef4444;--red-light:#fee2e2;
   --orange:#f59e0b;--orange-light:#fef3c7;
   --blue:#3b82f6;--blue-light:#dbeafe;
   --radius:14px;--radius-sm:10px;
   --shadow:0 1px 2px rgba(15,23,42,0.04),0 6px 20px rgba(15,23,42,0.05);
-  --sidebar-w:240px;
+  --sidebar-w:240px;--topbar-h:56px;--topbar-bg:#14213D;
 }
 body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
 i[data-lucide],svg.lucide{width:18px;height:18px;stroke-width:2;flex-shrink:0;}
 
 /* AUTH */
-.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:linear-gradient(135deg,#6366f1,#818cf8,#a5b4fc);}
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:linear-gradient(135deg,#0E7C6B,#2E9684,#7BC4B6);}
 .auth-box{background:#fff;border-radius:20px;padding:2.5rem 2rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(30,27,75,0.25);}
 .auth-logo{text-align:center;margin-bottom:1.5rem;}
 .auth-logo h1{font-size:24px;font-weight:500;color:var(--primary);margin-top:8px;letter-spacing:-0.01em;}
@@ -31,12 +31,15 @@ i[data-lucide],svg.lucide{width:18px;height:18px;stroke-width:2;flex-shrink:0;}
 .auth-tabs{display:flex;background:var(--surface2);border-radius:10px;padding:4px;margin-bottom:1.25rem;gap:4px;}
 .auth-tab{flex:1;background:none;border:none;padding:8px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text2);transition:all 0.15s;}
 .auth-tab.active{background:#fff;color:var(--primary);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.pill-tabs{display:flex;background:var(--surface2);border-radius:10px;padding:4px;margin-bottom:1.25rem;gap:4px;}
+.pill-tab{flex:1;background:none;border:none;padding:8px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text2);transition:all 0.15s;}
+.pill-tab.active{background:#fff;color:var(--primary);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
 .auth-form{display:none;}.auth-form.active{display:block;}
 .auth-field{margin-bottom:11px;}
 .auth-field label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px;}
 .auth-field input{width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:var(--radius-sm);font-size:14px;font-family:inherit;background:var(--surface2);color:var(--text);transition:all 0.15s;}
-.auth-field input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,0.12);background:#fff;}
-.auth-btn{width:100%;padding:11px;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;transition:opacity 0.15s;}
+.auth-field input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(14,124,107,0.12);background:#fff;}
+.auth-btn{width:100%;padding:11px;background:linear-gradient(135deg,#0E7C6B,#2E9684);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;transition:opacity 0.15s;}
 .auth-btn:hover{opacity:0.9;}
 .auth-btn.secondary{background:var(--surface2);color:var(--primary);border:1.5px solid var(--primary);margin-top:8px;}
 .auth-btn.secondary:hover{background:var(--primary-light);opacity:1;}
@@ -53,7 +56,17 @@ i[data-lucide],svg.lucide{width:18px;height:18px;stroke-width:2;flex-shrink:0;}
 /* APP SHELL */
 .app-wrap{display:none;}
 .app-shell{display:flex;min-height:100vh;}
-.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:60;transition:transform 0.2s;}
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-h);background:var(--topbar-bg);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:70;}
+.topbar-menu-btn{display:none;background:none;border:none;color:#fff;cursor:pointer;padding:4px;margin-right:6px;}
+.topbar-brand{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700;letter-spacing:-0.01em;}
+.topbar-brand .dot{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#0E7C6B,#2E9684);flex-shrink:0;}
+.topbar-right{display:flex;align-items:center;gap:14px;}
+.topbar-icon{position:relative;background:none;border:none;color:#AEBBD4;cursor:pointer;display:flex;padding:4px;}
+.topbar-icon:hover{color:#fff;}
+.topbar-badge{position:absolute;top:-1px;right:-3px;background:var(--red);color:#fff;font-size:9px;font-weight:800;min-width:14px;height:14px;border-radius:99px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+.topbar-who{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:#E7ECF5;padding-left:14px;border-left:1px solid rgba(255,255,255,0.15);}
+.topbar-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#0E7C6B,#2E9684);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:#fff;flex-shrink:0;}
+.sidebar{position:fixed;top:var(--topbar-h);left:0;bottom:0;width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:60;transition:transform 0.2s;}
 .sidebar-logo{display:flex;align-items:center;gap:10px;padding:18px;border-bottom:1px solid var(--border);}
 .sidebar-logo h1{font-size:15px;font-weight:500;line-height:1.3;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sidebar-logo p{font-size:11px;color:var(--text3);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -69,6 +82,10 @@ i[data-lucide],svg.lucide{width:18px;height:18px;stroke-width:2;flex-shrink:0;}
 .tab{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;padding:9px 12px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);font-family:inherit;transition:all 0.15s;}
 .tab:hover{background:var(--surface2);color:var(--text);}
 .tab.active{background:var(--primary-light);color:var(--primary-dark);font-weight:600;}
+.tab.child{padding-left:34px;font-size:12.5px;font-weight:500;}
+.tab.child i,.tab.child svg{width:14px;height:14px;}
+.nav-group-label{font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);margin:14px 12px 4px;}
+.nav-group-label:first-child{margin-top:2px;}
 .sidebar-user{border-top:1px solid var(--border);padding:12px 14px;display:flex;align-items:center;gap:10px;}
 .sidebar-user-avatar{width:32px;height:32px;border-radius:50%;background:var(--primary-light);color:var(--primary-dark);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .sidebar-user-info{flex:1;min-width:0;}
@@ -76,23 +93,24 @@ i[data-lucide],svg.lucide{width:18px;height:18px;stroke-width:2;flex-shrink:0;}
 .logout-btn{background:none;border:none;color:var(--text3);cursor:pointer;padding:6px;border-radius:8px;display:flex;}
 .logout-btn:hover{background:var(--red-light);color:var(--red);}
 
-.mobile-topbar{display:none;}
-.main-content{margin-left:var(--sidebar-w);flex:1;padding:2rem 2.5rem 4rem;max-width:1180px;width:100%;}
+.main-content{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);flex:1;padding:2rem 2.5rem 4rem;max-width:1180px;width:100%;}
+.crumb{font-size:12px;color:var(--text2);margin:0 0 16px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.crumb b{color:var(--text);font-weight:700;}
+.crumb .sep{opacity:.5;}
 .section{display:none;}.section.active{display:block;}
 
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%);box-shadow:0 0 40px rgba(0,0,0,0.15);}
   .sidebar.open{transform:translateX(0);}
-  .sidebar-backdrop.open{display:block;position:fixed;inset:0;background:rgba(15,23,42,0.35);z-index:55;}
+  .sidebar-backdrop.open{display:block;position:fixed;inset:var(--topbar-h) 0 0 0;background:rgba(15,23,42,0.35);z-index:55;}
   .main-content{margin-left:0;padding:1.1rem 1rem 3rem;}
-  .mobile-topbar{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:1.25rem;box-shadow:var(--shadow);position:sticky;top:10px;z-index:40;}
-  .mobile-topbar button{background:none;border:none;color:var(--text);cursor:pointer;display:flex;padding:2px;}
-  .mobile-topbar span{font-size:14px;font-weight:600;}
+  .topbar-menu-btn{display:flex;}
+  .topbar-who span{display:none;}
 }
 
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:1.5rem;}
 .card{background:var(--surface);border-radius:var(--radius);padding:1.1rem 1.2rem;box-shadow:var(--shadow);border:1px solid var(--border);}
-.card-icon{width:8px;height:8px;border-radius:99px;margin-bottom:10px;}
+.card-icon{width:8px;height:8px;border-radius:3px;margin-bottom:10px;}
 .card-icon.blue{background:var(--blue);}.card-icon.green{background:var(--green);}.card-icon.red{background:var(--red);}.card-icon.purple{background:var(--primary);}.card-icon.orange{background:var(--orange);}
 .card-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;}
 .card-value{font-size:22px;font-weight:700;}
@@ -105,7 +123,7 @@ i[data-lucide],svg.lucide{width:18px;height:18px;stroke-width:2;flex-shrink:0;}
 .field label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px;}
 input,select,textarea{width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:var(--radius-sm);font-size:14px;background:var(--surface2);color:var(--text);font-family:inherit;transition:all 0.15s;}
 textarea{resize:vertical;min-height:70px;}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,0.12);background:#fff;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(14,124,107,0.12);background:#fff;}
 input::placeholder{color:var(--text3);}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid #e2e8f0;background:var(--surface);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
 .btn:hover{background:var(--surface2);}
@@ -118,6 +136,14 @@ input::placeholder{color:var(--text3);}
 .btn.warning{background:var(--orange);color:#fff;border-color:var(--orange);}
 .btn.warning:hover{background:#d97706;}
 .btn-sm{padding:5px 9px;font-size:12px;border-radius:8px;}
+.rowacts{display:flex;gap:5px;}
+.btn-icon{width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:7px;border:1.5px solid #e2e8f0;background:var(--surface);color:var(--text2);cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.btn-icon:hover{background:var(--surface2);}
+.btn-icon i,.btn-icon svg{width:14px;height:14px;}
+.btn-icon.edit{color:var(--primary);border-color:rgba(14,124,107,0.35);}
+.btn-icon.edit:hover{background:var(--primary-light);}
+.btn-icon.danger{color:var(--red);border-color:rgba(239,68,68,0.35);}
+.btn-icon.danger:hover{background:var(--red-light);}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
 .table-wrap{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin-bottom:1.25rem;overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
@@ -126,7 +152,7 @@ td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle
 tr:last-child td{border-bottom:none;}
 tbody tr:hover td{background:#fafbfc;}
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
-.badge.low{background:var(--red-light);color:#b91c1c;}.badge.ok{background:var(--green-light);color:#065f46;}.badge.zero{background:var(--orange-light);color:#92400e;}.badge.pagto{background:var(--primary-light);color:#4338ca;}
+.badge.low{background:var(--orange-light);color:#92400e;}.badge.ok{background:var(--green-light);color:#065f46;}.badge.zero{background:var(--red-light);color:#b91c1c;}.badge.pagto{background:var(--primary-light);color:#0A5A4D;}
 .search-wrap{display:flex;gap:8px;margin-bottom:1rem;}
 .search-wrap input{max-width:320px;}
 .venda-items{border:1.5px solid #e2e8f0;border-radius:var(--radius-sm);overflow:hidden;margin-bottom:12px;}
@@ -137,7 +163,7 @@ tbody tr:hover td{background:#fafbfc;}
 .add-row{display:grid;grid-template-columns:2fr 80px auto;gap:10px;align-items:end;margin-bottom:14px;}
 .hist-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);}
 .hist-row:last-child{border-bottom:none;}
-.hist-icon{width:8px;height:8px;border-radius:99px;flex-shrink:0;margin-left:4px;}
+.hist-icon{width:8px;height:8px;border-radius:3px;flex-shrink:0;margin-left:4px;}
 .hist-icon.in{background:var(--green);}.hist-icon.venda{background:var(--blue);}.hist-icon.dev{background:var(--red);}
 .hist-meta{flex:1;}.hist-meta strong{display:block;font-weight:600;font-size:13px;}.hist-meta span{font-size:12px;color:var(--text3);}
 .hist-qty{font-weight:700;font-size:14px;}.hist-qty.in{color:var(--green);}.hist-qty.venda{color:var(--blue);}.hist-qty.dev{color:var(--red);}
@@ -149,7 +175,7 @@ tbody tr:hover td{background:#fafbfc;}
 .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
 .calc-res-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;}
 .crc{border-radius:var(--radius);padding:1rem 1.1rem;border:1px solid var(--border);}
-.crc.hl-blue{background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;}
+.crc.hl-blue{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;}
 .crc.hl-green{background:linear-gradient(135deg,#10b981,#34d399);color:#fff;}
 .crc.hl-red{background:linear-gradient(135deg,#ef4444,#f87171);color:#fff;}
 .crc.hl-orange{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#fff;}
@@ -163,8 +189,8 @@ tbody tr:hover td{background:#fafbfc;}
 .chart-title{font-size:14px;font-weight:500;margin-bottom:1rem;}
 .bar-chart{display:flex;align-items:flex-end;gap:6px;height:160px;padding-bottom:24px;}
 .bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;}
-.bar{width:100%;background:linear-gradient(180deg,#818cf8,#6366f1);border-radius:6px 6px 0 0;min-height:4px;cursor:pointer;}
-.bar:hover{background:linear-gradient(180deg,#a5b4fc,#818cf8);}
+.bar{width:100%;background:linear-gradient(180deg,#2E9684,#0E7C6B);border-radius:6px 6px 0 0;min-height:4px;cursor:pointer;}
+.bar:hover{background:linear-gradient(180deg,#7BC4B6,#2E9684);}
 .bar-label{font-size:10px;color:var(--text3);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
 .bar-val{font-size:10px;font-weight:700;color:var(--primary);text-align:center;}
 .bar-pair{display:flex;gap:2px;align-items:flex-end;justify-content:center;height:100%;width:100%;}
@@ -181,8 +207,8 @@ tbody tr:hover td{background:#fafbfc;}
 .dre-row.neg{color:var(--red);}
 .parcel-info{background:var(--primary-light);border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;color:var(--primary);font-weight:600;margin-bottom:12px;display:none;}
 .cli-card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);padding:1rem 1.2rem;display:flex;align-items:center;gap:14px;margin-bottom:10px;cursor:pointer;transition:box-shadow 0.15s;}
-.cli-card:hover{box-shadow:0 4px 16px rgba(99,102,241,0.15);}
-.cli-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;}
+.cli-card:hover{box-shadow:0 4px 16px rgba(14,124,107,0.15);}
+.cli-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#0E7C6B,#2E9684);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;}
 .cli-info{flex:1;}.cli-info strong{display:block;font-weight:600;}.cli-info span{font-size:12px;color:var(--text3);}
 .cli-pts{background:var(--orange-light);color:#92400e;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;}
 .pts-bar-wrap{background:var(--surface2);border-radius:8px;padding:12px 16px;margin-bottom:12px;}
@@ -211,7 +237,7 @@ tbody tr:hover td{background:#fafbfc;}
 <div class="auth-wrap" id="auth-wrap">
   <div class="auth-box">
     <div class="auth-logo">
-      <svg width="56" height="56" viewBox="0 0 44 44" style="margin:0 auto;display:block"><rect x="2" y="2" width="24" height="30" rx="4" fill="url(#lg1)"/><rect x="18" y="12" width="24" height="30" rx="4" fill="#a5b4fc"/><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
+      <svg width="56" height="56" viewBox="0 0 44 44" style="margin:0 auto;display:block"><rect x="2" y="2" width="24" height="30" rx="4" fill="url(#lg1)"/><rect x="18" y="12" width="24" height="30" rx="4" fill="#7BC4B6"/><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0E7C6B"/><stop offset="1" stop-color="#2E9684"/></linearGradient></defs></svg>
       <h1>StockPro</h1><p>Gestão de varejo simplificada</p>
     </div>
     <div class="auth-tabs">
@@ -250,13 +276,26 @@ tbody tr:hover td{background:#fafbfc;}
 
 <!-- APP -->
 <div class="app-wrap" id="app-wrap">
+  <header class="topbar">
+    <div style="display:flex;align-items:center">
+      <button class="topbar-menu-btn" onclick="toggleSidebar(true)"><i data-lucide="menu"></i></button>
+      <div class="topbar-brand"><span class="dot"></span>StockPro</div>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-icon" onclick="irParaAlertas()" title="Alertas de estoque">
+        <i data-lucide="bell"></i>
+        <span class="topbar-badge" id="topbar-alert-badge" style="display:none">0</span>
+      </button>
+      <div class="topbar-who"><div class="topbar-avatar" id="topbar-avatar">--</div><span id="topbar-nome-display"></span></div>
+    </div>
+  </header>
   <div class="app-shell">
     <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-logo">
         <div class="sidebar-logo-img-wrap">
           <img id="sidebar-logo-img" class="sidebar-logo-img hidden" alt="Logo da empresa">
-          <svg id="sidebar-logo-default" width="34" height="34" viewBox="0 0 44 44"><rect x="2" y="2" width="24" height="30" rx="4" fill="url(#lg2)"/><rect x="18" y="12" width="24" height="30" rx="4" fill="#a5b4fc"/><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
+          <svg id="sidebar-logo-default" width="34" height="34" viewBox="0 0 44 44"><rect x="2" y="2" width="24" height="30" rx="4" fill="url(#lg2)"/><rect x="18" y="12" width="24" height="30" rx="4" fill="#7BC4B6"/><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0E7C6B"/><stop offset="1" stop-color="#2E9684"/></linearGradient></defs></svg>
         </div>
         <div class="sidebar-logo-info">
           <h1 id="empresa-nome-display">StockPro</h1>
@@ -265,22 +304,32 @@ tbody tr:hover td{background:#fafbfc;}
         </div>
       </div>
       <nav class="sidebar-nav">
-        <button class="tab active" onclick="showTab('painel',this)"><i data-lucide="layout-dashboard"></i>Painel</button>
-        <button class="tab" onclick="showTab('produtos',this)"><i data-lucide="package"></i>Produtos</button>
-        <button class="tab" onclick="showTab('clientes',this)"><i data-lucide="users"></i>Clientes</button>
+        <div class="nav-group-label">Principal</div>
+        <button class="tab active" id="navbtn-painel" onclick="showTab('painel',this)"><i data-lucide="layout-dashboard"></i>Painel</button>
         <button class="tab" id="navbtn-vendas" onclick="showTab('vendas',this)"><i data-lucide="shopping-cart"></i>Nova venda</button>
+        <button class="tab child" onclick="navSubTab('vendas','devolucao')"><i data-lucide="rotate-ccw"></i>Devolução</button>
+        <button class="tab" onclick="showTab('clientes',this)"><i data-lucide="users"></i>Clientes</button>
         <button class="tab" onclick="showTab('orcamentos',this)"><i data-lucide="file-text"></i>Orçamentos</button>
+
+        <div class="nav-group-label">Estoque</div>
+        <button class="tab" id="navbtn-produtos" onclick="showTab('produtos',this)"><i data-lucide="package"></i>Produtos</button>
+        <button class="tab child" onclick="navSubTab('produtos','produtos')"><i data-lucide="list"></i>Gerenciar produtos</button>
+        <button class="tab child" onclick="navSubTab('produtos','movimentar')"><i data-lucide="arrow-down-circle"></i>Movimentar estoque</button>
+
+        <div class="nav-group-label">Financeiro</div>
         <button class="tab" onclick="showTab('fiado',this)"><i data-lucide="credit-card"></i>Fiado</button>
-        <button class="tab" onclick="showTab('devolucoes',this)"><i data-lucide="rotate-ccw"></i>Devoluções</button>
-        <button class="tab" onclick="showTab('movimentar',this)"><i data-lucide="arrow-down-circle"></i>Movimentar</button>
-        <button class="tab" onclick="showTab('historico',this)"><i data-lucide="clock"></i>Histórico</button>
         <button class="tab" onclick="showTab('caixa',this)"><i data-lucide="wallet"></i>Caixa</button>
+        <button class="tab" onclick="showTab('prolabore',this)"><i data-lucide="piggy-bank"></i>Pró-Labore</button>
+        <button class="tab" onclick="showTab('mei',this)"><i data-lucide="file-check"></i>MEI</button>
+
+        <div class="nav-group-label">Relatórios</div>
+        <button class="tab" onclick="showTab('historico',this)"><i data-lucide="clock"></i>Histórico</button>
         <button class="tab" onclick="showTab('relatorio',this)"><i data-lucide="bar-chart-2"></i>Relatório</button>
         <button class="tab" onclick="showTab('rel-clientes',this)"><i data-lucide="trending-up"></i>Rel. Clientes</button>
         <button class="tab" onclick="showTab('metas',this)"><i data-lucide="target"></i>Metas</button>
         <button class="tab" onclick="showTab('calculadora',this)"><i data-lucide="calculator"></i>Calculadora</button>
-        <button class="tab" onclick="showTab('mei',this)"><i data-lucide="file-check"></i>MEI</button>
-        <button class="tab" onclick="showTab('prolabore',this)"><i data-lucide="piggy-bank"></i>Pró-Labore</button>
+
+        <div class="nav-group-label">Sistema</div>
         <button class="tab" onclick="showTab('configuracoes',this)"><i data-lucide="settings"></i>Config.</button>
       </nav>
       <div class="sidebar-user">
@@ -291,11 +340,7 @@ tbody tr:hover td{background:#fafbfc;}
     </aside>
 
     <div class="main-content">
-      <div class="mobile-topbar">
-        <button onclick="toggleSidebar(true)"><i data-lucide="menu"></i></button>
-        <span>StockPro</span>
-      </div>
-
+      <nav class="crumb" id="page-crumb"></nav>
       <!-- PAINEL -->
       <div id="tab-painel" class="section active">
         <div id="mei-alerta-das" class="feedback err" style="display:none;font-size:14px"></div>
@@ -311,6 +356,11 @@ tbody tr:hover td{background:#fafbfc;}
 
       <!-- PRODUTOS -->
       <div id="tab-produtos" class="section">
+        <div class="pill-tabs" style="max-width:360px">
+          <button class="pill-tab active" id="subtab-produtos" onclick="mostrarSubProduto('produtos',this)">Produtos</button>
+          <button class="pill-tab" id="subtab-movimentar" onclick="mostrarSubProduto('movimentar',this)">Movimentar</button>
+        </div>
+        <div id="produto-sub-produtos">
         <div class="panel">
           <div class="panel-title"><i data-lucide="plus"></i> <span id="form-title">Cadastrar novo produto</span></div>
           <div class="form-row three">
@@ -347,6 +397,19 @@ tbody tr:hover td{background:#fafbfc;}
           <table><thead><tr><th>Produto</th><th>SKU</th><th>Categoria</th><th>Custo</th><th>Preço</th><th>Margem</th><th>Qtd.</th><th>Status</th><th></th></tr></thead>
           <tbody id="tabela-produtos"></tbody></table>
         </div>
+        </div>
+        <div id="produto-sub-movimentar" style="display:none">
+        <div class="panel">
+          <div class="panel-title"><i data-lucide="arrow-down-circle"></i> Registrar entrada de estoque</div>
+          <div class="form-row">
+            <div class="field"><label>Produto</label><select id="m-prod"><option value="">Selecione...</option></select></div>
+            <div class="field"><label>Quantidade</label><input id="m-qty" type="number" min="1" placeholder="1"></div>
+          </div>
+          <div class="field" style="margin-bottom:14px"><label>Observação</label><input id="m-obs" placeholder="Ex: Compra do fornecedor XYZ"></div>
+          <div class="btn-row"><button class="btn success" onclick="registrarEntrada()"><i data-lucide="arrow-down-circle"></i> Registrar entrada</button></div>
+          <div id="mov-feedback" class="feedback"></div>
+        </div>
+        </div>
       </div>
 
       <!-- CLIENTES -->
@@ -375,6 +438,11 @@ tbody tr:hover td{background:#fafbfc;}
 
       <!-- VENDAS -->
       <div id="tab-vendas" class="section">
+        <div class="pill-tabs" style="max-width:360px">
+          <button class="pill-tab active" id="subtab-nova-venda" onclick="mostrarSubVenda('nova',this)">Nova venda</button>
+          <button class="pill-tab" id="subtab-devolucao" onclick="mostrarSubVenda('devolucao',this)">Devolução</button>
+        </div>
+        <div id="venda-sub-nova">
         <div class="panel">
           <div class="panel-title"><i data-lucide="receipt"></i> Registrar venda</div>
           <div class="form-row" style="max-width:220px">
@@ -439,6 +507,24 @@ tbody tr:hover td{background:#fafbfc;}
           <table><thead><tr><th>Data</th><th>Cliente</th><th>Itens</th><th>Pagamento</th><th>Parcelas</th><th>Pontos</th><th>Total</th><th></th></tr></thead>
           <tbody id="tabela-vendas"></tbody></table>
         </div>
+        </div>
+        <div id="venda-sub-devolucao" style="display:none">
+        <div class="panel">
+          <div class="panel-title"><i data-lucide="rotate-ccw"></i> Registrar devolução</div>
+          <div class="form-row">
+            <div class="field"><label>Venda</label><select id="d-venda"><option value="">Selecione...</option></select></div>
+            <div class="field"><label>Motivo</label><input id="d-motivo" placeholder="Ex: Produto com defeito"></div>
+          </div>
+          <div id="d-itens-wrap" style="display:none">
+            <p style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;">Marque os itens a devolver</p>
+            <div id="d-itens-lista" class="venda-items"></div>
+          </div>
+          <div class="btn-row"><button class="btn danger" onclick="registrarDevolucao()"><i data-lucide="rotate-ccw"></i> Confirmar devolução</button></div>
+          <div id="dev-feedback" class="feedback"></div>
+        </div>
+        <div class="sec-header">Histórico de devoluções</div>
+        <div class="table-wrap"><div id="historico-devolucoes"></div></div>
+        </div>
       </div>
 
       <!-- ORÇAMENTOS -->
@@ -467,38 +553,6 @@ tbody tr:hover td{background:#fafbfc;}
         <div class="table-wrap"><div id="lista-fiados"></div></div>
       </div>
 
-      <!-- DEVOLUÇÕES -->
-      <div id="tab-devolucoes" class="section">
-        <div class="panel">
-          <div class="panel-title"><i data-lucide="rotate-ccw"></i> Registrar devolução</div>
-          <div class="form-row">
-            <div class="field"><label>Venda</label><select id="d-venda"><option value="">Selecione...</option></select></div>
-            <div class="field"><label>Motivo</label><input id="d-motivo" placeholder="Ex: Produto com defeito"></div>
-          </div>
-          <div id="d-itens-wrap" style="display:none">
-            <p style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;">Marque os itens a devolver</p>
-            <div id="d-itens-lista" class="venda-items"></div>
-          </div>
-          <div class="btn-row"><button class="btn danger" onclick="registrarDevolucao()"><i data-lucide="rotate-ccw"></i> Confirmar devolução</button></div>
-          <div id="dev-feedback" class="feedback"></div>
-        </div>
-        <div class="sec-header">Histórico de devoluções</div>
-        <div class="table-wrap"><div id="historico-devolucoes"></div></div>
-      </div>
-
-      <!-- MOVIMENTAR -->
-      <div id="tab-movimentar" class="section">
-        <div class="panel">
-          <div class="panel-title"><i data-lucide="arrow-down-circle"></i> Registrar entrada de estoque</div>
-          <div class="form-row">
-            <div class="field"><label>Produto</label><select id="m-prod"><option value="">Selecione...</option></select></div>
-            <div class="field"><label>Quantidade</label><input id="m-qty" type="number" min="1" placeholder="1"></div>
-          </div>
-          <div class="field" style="margin-bottom:14px"><label>Observação</label><input id="m-obs" placeholder="Ex: Compra do fornecedor XYZ"></div>
-          <div class="btn-row"><button class="btn success" onclick="registrarEntrada()"><i data-lucide="arrow-down-circle"></i> Registrar entrada</button></div>
-          <div id="mov-feedback" class="feedback"></div>
-        </div>
-      </div>
 
       <!-- HISTÓRICO -->
       <div id="tab-historico" class="section">
@@ -940,7 +994,7 @@ tbody tr:hover td{background:#fafbfc;}
 <div class="auth-wrap hidden" id="paywall-wrap">
   <div class="auth-box" style="text-align:center">
     <div class="auth-logo">
-      <svg width="56" height="56" viewBox="0 0 44 44" style="margin:0 auto;display:block"><rect x="2" y="2" width="24" height="30" rx="4" fill="url(#lg3)"/><rect x="18" y="12" width="24" height="30" rx="4" fill="#a5b4fc"/><defs><linearGradient id="lg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
+      <svg width="56" height="56" viewBox="0 0 44 44" style="margin:0 auto;display:block"><rect x="2" y="2" width="24" height="30" rx="4" fill="url(#lg3)"/><rect x="18" y="12" width="24" height="30" rx="4" fill="#7BC4B6"/><defs><linearGradient id="lg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0E7C6B"/><stop offset="1" stop-color="#2E9684"/></linearGradient></defs></svg>
       <h1>StockPro</h1>
     </div>
     <h3 id="paywall-titulo" style="margin:8px 0 6px">Assinatura pendente</h3>
@@ -1188,7 +1242,9 @@ tbody tr:hover td{background:#fafbfc;}
     }
     document.getElementById('paywall-wrap').classList.add('hidden');
     document.getElementById('user-nome-display').textContent=usuarioAtual.nome;
+    atualizarTopbarUsuario(usuarioAtual.nome);
     atualizarCabecalhoEmpresa(usuarioAtual);
+    atualizarBreadcrumb('painel');
     document.getElementById('auth-wrap').style.display='none';document.getElementById('app-wrap').style.display='block';
     itensVenda=[];renderPainel();
   }
@@ -1274,18 +1330,45 @@ tbody tr:hover td{background:#fafbfc;}
   (async function(){var s=localStorage.getItem(sessaoKey);if(s){try{var u=JSON.parse(s);if(u&&u.id)await iniciarApp(u);}catch(e){}}})();
 
   // ── TABS ──────────────────────────────────────────────
+  var crumbMap={
+    painel:{grupo:null,label:'Painel'},
+    vendas:{grupo:'Principal',label:'Nova venda'},
+    clientes:{grupo:'Principal',label:'Clientes'},
+    orcamentos:{grupo:'Principal',label:'Orçamentos'},
+    produtos:{grupo:'Estoque',label:'Produtos'},
+    fiado:{grupo:'Financeiro',label:'Fiado'},
+    caixa:{grupo:'Financeiro',label:'Caixa'},
+    prolabore:{grupo:'Financeiro',label:'Pró-Labore'},
+    mei:{grupo:'Financeiro',label:'MEI'},
+    historico:{grupo:'Relatórios',label:'Histórico'},
+    relatorio:{grupo:'Relatórios',label:'Relatório'},
+    'rel-clientes':{grupo:'Relatórios',label:'Rel. Clientes'},
+    metas:{grupo:'Relatórios',label:'Metas'},
+    calculadora:{grupo:'Relatórios',label:'Calculadora'},
+    configuracoes:{grupo:'Sistema',label:'Config.'}
+  };
+  function atualizarBreadcrumb(t,sub){
+    var info=crumbMap[t]||{grupo:null,label:t};
+    var partes=['Início'];
+    if(info.grupo)partes.push(info.grupo);
+    partes.push(info.label);
+    if(sub)partes.push(sub);
+    document.getElementById('page-crumb').innerHTML=partes.map(function(p,i){
+      var isLast=i===partes.length-1;
+      return (i>0?'<span class="sep">/</span>':'')+(isLast?'<b>'+p+'</b>':'<span>'+p+'</span>');
+    }).join('');
+  }
   window.showTab=function(t,btn){
     document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
     document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('active');});
     document.getElementById('tab-'+t).classList.add('active');btn.classList.add('active');
+    atualizarBreadcrumb(t);
     if(t==='painel')renderPainel();
-    if(t==='produtos')renderProdutos();
+    if(t==='produtos'){renderProdutos();renderMovSelect();}
     if(t==='clientes')renderClientes();
-    if(t==='vendas'){renderVendaSelect();renderClienteSelect();renderVendas();}
+    if(t==='vendas'){renderVendaSelect();renderClienteSelect();renderVendas();renderDevolucaoSelect();renderHistoricoDevolucoes();}
     if(t==='orcamentos')renderOrcamentos();
     if(t==='fiado'){renderFiadoClienteSelect();renderFiados();}
-    if(t==='devolucoes'){renderDevolucaoSelect();renderHistoricoDevolucoes();}
-    if(t==='movimentar')renderMovSelect();
     if(t==='historico')renderHistorico();
     if(t==='caixa')renderCaixa();
     if(t==='rel-clientes')renderRelClientes();
@@ -1295,12 +1378,45 @@ tbody tr:hover td{background:#fafbfc;}
     if(t==='configuracoes')carregarPerfil();
     toggleSidebar(false);
   };
+  window.mostrarSubVenda=function(tipo,btn){
+    document.querySelectorAll('#tab-vendas .pill-tab').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById('venda-sub-nova').style.display=tipo==='nova'?'block':'none';
+    document.getElementById('venda-sub-devolucao').style.display=tipo==='devolucao'?'block':'none';
+    atualizarBreadcrumb('vendas',tipo==='devolucao'?'Devolução':null);
+    if(tipo==='devolucao'){renderDevolucaoSelect();renderHistoricoDevolucoes();}
+  };
+  window.mostrarSubProduto=function(tipo,btn){
+    document.querySelectorAll('#tab-produtos .pill-tab').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById('produto-sub-produtos').style.display=tipo==='produtos'?'block':'none';
+    document.getElementById('produto-sub-movimentar').style.display=tipo==='movimentar'?'block':'none';
+    atualizarBreadcrumb('produtos',tipo==='movimentar'?'Movimentar estoque':null);
+    if(tipo==='movimentar')renderMovSelect();
+  };
 
   // ── SIDEBAR (mobile) ─────────────────────────────────
   window.toggleSidebar=function(open){
     var sb=document.getElementById('sidebar'),bd=document.getElementById('sidebar-backdrop');
     var willOpen=typeof open==='boolean'?open:!sb.classList.contains('open');
     sb.classList.toggle('open',willOpen);bd.classList.toggle('open',willOpen);
+  };
+  function atualizarTopbarUsuario(nome){
+    var iniciais=(nome||'').trim().split(/\s+/).slice(0,2).map(function(p){return p[0]||'';}).join('').toUpperCase();
+    var av=document.getElementById('topbar-avatar');if(av)av.textContent=iniciais||'--';
+    var nm=document.getElementById('topbar-nome-display');if(nm)nm.textContent=nome||'';
+  }
+  window.irParaAlertas=function(){
+    showTab('painel',document.getElementById('navbtn-painel'));
+  };
+  window.navSubTab=function(secao,sub){
+    if(secao==='vendas'){
+      showTab('vendas',document.getElementById('navbtn-vendas'));
+      mostrarSubVenda(sub,document.getElementById(sub==='devolucao'?'subtab-devolucao':'subtab-nova-venda'));
+    }else if(secao==='produtos'){
+      showTab('produtos',document.getElementById('navbtn-produtos'));
+      mostrarSubProduto(sub,document.getElementById(sub==='movimentar'?'subtab-movimentar':'subtab-produtos'));
+    }
   };
 
   // ── PAINEL ────────────────────────────────────────────
@@ -1338,6 +1454,11 @@ tbody tr:hover td{background:#fafbfc;}
       '<div class="card"><div class="card-icon '+(dasPagoMes?'green':'red')+'"></div><div class="card-label">DAS do mês</div><div class="card-value" style="font-size:16px;color:'+(dasPagoMes?'var(--green)':'var(--red)')+'">'+(dasPagoMes?'Pago':'Pendente')+'</div></div>'
       ):'');
     var alertas=ps.filter(function(p){return p.qty<=p.min;});
+    var badgeEl=document.getElementById('topbar-alert-badge');
+    if(badgeEl){
+      if(alertas.length){badgeEl.textContent=alertas.length>99?'99+':alertas.length;badgeEl.style.display='flex';}
+      else badgeEl.style.display='none';
+    }
     document.getElementById('alert-list').innerHTML=!alertas.length
       ?'<div class="empty">Nenhum alerta</div>'
       :'<table><thead><tr><th>Produto</th><th>SKU</th><th>Qtd.</th><th>Mínimo</th><th>Status</th></tr></thead><tbody>'
@@ -1393,7 +1514,7 @@ tbody tr:hover td{background:#fafbfc;}
       return '<tr><td><strong>'+p.nome+'</strong></td><td style="color:var(--text3);font-size:12px">'+(p.sku||'—')+'</td><td>'+(p.cat||'—')+'</td>'
         +'<td>'+brl(p.custo||0)+'</td><td style="'+(abaixoCusto?'color:var(--red);font-weight:700':'')+'">'+brl(p.preco)+(abaixoCusto?' <span class="badge zero">Abaixo do custo</span>':'')+'</td><td style="color:'+(abaixoCusto?'var(--red)':'var(--green)')+';font-weight:600">'+margem+'</td>'
         +'<td><strong>'+p.qty+'</strong></td><td>'+statusBadge(p)+'</td>'
-        +'<td><div style="display:flex;gap:5px"><button class="btn btn-sm" onclick="verHistoricoPreco(\''+p.id+'\')" title="Histórico de preços"><i data-lucide="history"></i></button><button class="btn btn-sm" onclick="editarProduto(\''+p.id+'\')">Editar</button><button class="btn btn-sm danger" onclick="confirmarExcluir(\''+p.id+'\')">Excluir</button></div></td></tr>';
+        +'<td><div class="rowacts"><button class="btn-icon" onclick="verHistoricoPreco(\''+p.id+'\')" title="Histórico de preços"><i data-lucide="history"></i></button><button class="btn-icon edit" onclick="editarProduto(\''+p.id+'\')" title="Editar"><i data-lucide="pencil"></i></button><button class="btn-icon danger" onclick="confirmarExcluir(\''+p.id+'\')" title="Excluir"><i data-lucide="trash-2"></i></button></div></td></tr>';
     }).join('');
     if(window.lucide)lucide.createIcons();
   };
@@ -2145,7 +2266,7 @@ tbody tr:hover td{background:#fafbfc;}
     var maxV=Math.max.apply(null,dm.map(function(m){return m.total;}))||1;
     document.getElementById('grafico-mensal').innerHTML=dm.map(function(m){
       var h=Math.max((m.total/maxV)*140,m.total>0?6:2);
-      var cor=m.total>0?'linear-gradient(180deg,#818cf8,#6366f1)':'#e2e8f0';
+      var cor=m.total>0?'linear-gradient(180deg,#2E9684,#0E7C6B)':'#e2e8f0';
       return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%">'
         +'<div style="font-size:10px;font-weight:700;color:var(--primary);text-align:center">'+(m.total>0?brl(m.total).replace('R$ ',''):'')+'</div>'
         +'<div style="flex:1;display:flex;align-items:flex-end;width:100%"><div style="width:100%;height:'+h+'px;background:'+cor+';border-radius:6px 6px 0 0"></div></div>'
@@ -2829,6 +2950,7 @@ tbody tr:hover td{background:#fafbfc;}
     Object.assign(usuarioAtual,{nome:nome,empresa:empresa,fantasia:fantasia,cnpj:cnpj});
     localStorage.setItem(sessaoKey,JSON.stringify(usuarioAtual));
     document.getElementById('user-nome-display').textContent=nome;
+    atualizarTopbarUsuario(nome);
     atualizarCabecalhoEmpresa(usuarioAtual);
     hideLoad();showFb('cfg-fb1','Dados atualizados!','ok');
   };
