@@ -101,9 +101,15 @@ i[data-lucide],svg.lucide{width:18px;height:18px;stroke-width:2;flex-shrink:0;}
 .nav-children.open{display:block;}
 
 .main-content{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);flex:1;padding:2rem 2.5rem 4rem;max-width:1180px;width:100%;}
-.crumb{font-size:12px;color:var(--text2);margin:0 0 16px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.crumb{font-size:12px;color:var(--text2);margin:0 0 10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
 .crumb b{color:var(--text);font-weight:700;}
 .crumb .sep{opacity:.5;}
+.crumb-link{background:none;border:none;padding:0;font:inherit;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;}
+.crumb-link:hover{color:var(--primary);text-decoration:underline;}
+.page-title-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
+.page-title-h{display:flex;align-items:center;gap:9px;font-size:19px;font-weight:700;color:var(--text);margin:0;letter-spacing:-0.01em;}
+.page-title-h i,.page-title-h svg{width:20px!important;height:20px!important;color:var(--primary);}
+#page-title-actions:empty{display:none;}
 .section{display:none;}.section.active{display:block;}
 
 @media(max-width:768px){
@@ -123,6 +129,7 @@ i[data-lucide],svg.lucide{width:18px;height:18px;stroke-width:2;flex-shrink:0;}
 .card-value{font-size:22px;font-weight:700;}
 .sec-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;}
 .panel{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);padding:1.25rem;margin-bottom:1.25rem;}
+.toggle-form-row{margin-bottom:14px;}
 .panel-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--text);margin-bottom:1rem;padding-bottom:10px;border-bottom:1px solid var(--border);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
 .form-row.three{grid-template-columns:2fr 1fr 1fr;}
@@ -352,6 +359,10 @@ tbody tr:hover td{background:#fafbfc;}
 
     <div class="main-content">
       <nav class="crumb" id="page-crumb"></nav>
+      <div class="page-title-row">
+        <h1 class="page-title-h"><span id="page-title-iconwrap"><i data-lucide="layout-dashboard"></i></span><span id="page-title-label">Painel</span></h1>
+        <div id="page-title-actions"></div>
+      </div>
       <!-- PAINEL -->
       <div id="tab-painel" class="section active">
         <div id="mei-alerta-das" class="feedback err" style="display:none;font-size:14px"></div>
@@ -368,7 +379,8 @@ tbody tr:hover td{background:#fafbfc;}
       <!-- PRODUTOS -->
       <div id="tab-produtos" class="section">
         <div id="produto-sub-produtos">
-        <div class="panel">
+        <div class="toggle-form-row"><button class="btn primary" id="btn-toggle-produto" onclick="togglePanel('panel-form-produto',this,'Novo produto')"><i data-lucide="plus"></i> Novo produto</button></div>
+        <div class="panel" id="panel-form-produto" style="display:none">
           <div class="panel-title"><i data-lucide="plus"></i> <span id="form-title">Cadastrar novo produto</span></div>
           <div class="form-row three">
             <div class="field"><label>Nome</label><input id="p-nome" placeholder="Ex: Camiseta P"></div>
@@ -399,14 +411,16 @@ tbody tr:hover td{background:#fafbfc;}
             <button class="btn" onclick="cancelarEdicao()"><i data-lucide="x"></i> Cancelar</button>
           </div>
         </div>
-        <div class="search-wrap"><input id="busca" placeholder="Buscar produto..." oninput="renderProdutos()"></div>
+        <div id="busca-home"></div>
+        <div class="search-wrap" id="busca-wrap"><input id="busca" placeholder="Buscar produto..." oninput="renderProdutos()"></div>
         <div class="table-wrap">
           <table><thead><tr><th>Produto</th><th>SKU</th><th>Categoria</th><th>Custo</th><th>Preço</th><th>Margem</th><th>Qtd.</th><th>Status</th><th></th></tr></thead>
           <tbody id="tabela-produtos"></tbody></table>
         </div>
         </div>
         <div id="produto-sub-movimentar" style="display:none">
-        <div class="panel">
+        <div class="toggle-form-row"><button class="btn primary" id="btn-toggle-mov" onclick="togglePanel('panel-form-mov',this,'Nova movimentação')"><i data-lucide="plus"></i> Nova movimentação</button></div>
+        <div class="panel" id="panel-form-mov" style="display:none">
           <div class="panel-title"><i data-lucide="arrow-down-circle"></i> Registrar entrada de estoque</div>
           <div class="form-row">
             <div class="field"><label>Produto</label><select id="m-prod"><option value="">Selecione...</option></select></div>
@@ -421,7 +435,8 @@ tbody tr:hover td{background:#fafbfc;}
 
       <!-- CLIENTES -->
       <div id="tab-clientes" class="section">
-        <div class="panel">
+        <div class="toggle-form-row"><button class="btn primary" id="btn-toggle-cliente" onclick="togglePanel('panel-form-cliente',this,'Novo cliente')"><i data-lucide="plus"></i> Novo cliente</button></div>
+        <div class="panel" id="panel-form-cliente" style="display:none">
           <div class="panel-title"><i data-lucide="user"></i> <span id="cli-form-title">Cadastrar cliente</span></div>
           <div class="form-row four">
             <div class="field"><label>Nome completo</label><input id="cli-nome" placeholder="Nome do cliente"></div>
@@ -446,7 +461,8 @@ tbody tr:hover td{background:#fafbfc;}
       <!-- VENDAS -->
       <div id="tab-vendas" class="section">
         <div id="venda-sub-nova">
-        <div class="panel">
+        <div class="toggle-form-row"><button class="btn primary" id="btn-toggle-venda" onclick="togglePanel('panel-form-venda',this,'Registrar venda')"><i data-lucide="plus"></i> Registrar venda</button></div>
+        <div class="panel" id="panel-form-venda" style="display:none">
           <div class="panel-title"><i data-lucide="receipt"></i> Registrar venda</div>
           <div class="form-row" style="max-width:220px">
             <div class="field"><label>Data da venda</label><input id="v-data" type="date"></div>
@@ -512,7 +528,8 @@ tbody tr:hover td{background:#fafbfc;}
         </div>
         </div>
         <div id="venda-sub-devolucao" style="display:none">
-        <div class="panel">
+        <div class="toggle-form-row"><button class="btn primary" id="btn-toggle-devolucao" onclick="togglePanel('panel-form-devolucao',this,'Registrar devolução')"><i data-lucide="plus"></i> Registrar devolução</button></div>
+        <div class="panel" id="panel-form-devolucao" style="display:none">
           <div class="panel-title"><i data-lucide="rotate-ccw"></i> Registrar devolução</div>
           <div class="form-row">
             <div class="field"><label>Venda</label><select id="d-venda"><option value="">Selecione...</option></select></div>
@@ -541,7 +558,8 @@ tbody tr:hover td{background:#fafbfc;}
 
       <!-- FIADO -->
       <div id="tab-fiado" class="section">
-        <div class="panel">
+        <div class="toggle-form-row"><button class="btn primary" id="btn-toggle-fiado" onclick="togglePanel('panel-form-fiado',this,'Registrar fiado')"><i data-lucide="plus"></i> Registrar fiado</button></div>
+        <div class="panel" id="panel-form-fiado" style="display:none">
           <div class="panel-title"><i data-lucide="credit-card"></i> Registrar fiado</div>
           <div class="form-row four">
             <div class="field"><label>Cliente</label><select id="fiado-cliente-sel"><option value="">Selecione...</option></select></div>
@@ -566,7 +584,8 @@ tbody tr:hover td{background:#fafbfc;}
       <!-- CAIXA -->
       <div id="tab-caixa" class="section">
         <div id="caixa-fechado">
-          <div class="panel">
+          <div class="toggle-form-row"><button class="btn primary" id="btn-toggle-caixa-abertura" onclick="togglePanel('panel-form-caixa-abertura',this,'Abrir caixa')"><i data-lucide="plus"></i> Abrir caixa</button></div>
+          <div class="panel" id="panel-form-caixa-abertura" style="display:none">
             <div class="panel-title"><i data-lucide="wallet"></i> Abrir caixa do dia</div>
             <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Informe o saldo inicial em caixa no início do dia.</p>
             <div class="form-row" style="max-width:400px">
@@ -581,7 +600,8 @@ tbody tr:hover td{background:#fafbfc;}
         </div>
         <div id="caixa-aberto" style="display:none">
           <div class="cards" id="caixa-cards"></div>
-          <div class="panel">
+          <div class="toggle-form-row"><button class="btn primary" id="btn-toggle-caixa-saida" onclick="togglePanel('panel-form-caixa-saida',this,'Registrar saída')"><i data-lucide="plus"></i> Registrar saída</button></div>
+          <div class="panel" id="panel-form-caixa-saida" style="display:none">
             <div class="panel-title"><i data-lucide="minus-circle"></i> Registrar saída manual</div>
             <div class="form-row four">
               <div class="field"><label>Descrição</label><input id="caixa-saida-desc" placeholder="Ex: Pagamento fornecedor"></div>
@@ -610,7 +630,8 @@ tbody tr:hover td{background:#fafbfc;}
               <tbody id="caixa-movs"></tbody></table>
             </div>
           </div>
-          <div class="panel">
+          <div class="toggle-form-row"><button class="btn primary" id="btn-toggle-caixa-fechamento" onclick="togglePanel('panel-form-caixa-fechamento',this,'Fechar caixa')"><i data-lucide="plus"></i> Fechar caixa</button></div>
+          <div class="panel" id="panel-form-caixa-fechamento" style="display:none">
             <div class="panel-title"><i data-lucide="lock"></i> Fechar caixa</div>
             <div class="form-row" style="max-width:400px">
               <div class="field"><label>Saldo final em caixa (R$)</label><input id="caixa-saldo-final" type="number" min="0" step="0.01" placeholder="0,00"></div>
@@ -1333,38 +1354,65 @@ tbody tr:hover td{background:#fafbfc;}
 
   // ── TABS ──────────────────────────────────────────────
   var crumbMap={
-    painel:{grupo:null,label:'Painel'},
-    vendas:{grupo:'Principal',label:'Nova venda'},
-    clientes:{grupo:'Principal',label:'Clientes'},
-    orcamentos:{grupo:'Principal',label:'Orçamentos'},
-    produtos:{grupo:'Estoque',label:'Produtos'},
-    fiado:{grupo:'Financeiro',label:'Fiado'},
-    caixa:{grupo:'Financeiro',label:'Caixa'},
-    prolabore:{grupo:'Financeiro',label:'Pró-Labore'},
-    mei:{grupo:'Financeiro',label:'MEI'},
-    historico:{grupo:'Relatórios',label:'Histórico'},
-    relatorio:{grupo:'Relatórios',label:'Relatório'},
-    'rel-clientes':{grupo:'Relatórios',label:'Rel. Clientes'},
-    metas:{grupo:'Relatórios',label:'Metas'},
-    calculadora:{grupo:'Relatórios',label:'Calculadora'},
-    configuracoes:{grupo:'Sistema',label:'Config.'}
+    painel:{label:'Painel',icon:'layout-dashboard'},
+    vendas:{label:'Nova venda',icon:'shopping-cart'},
+    clientes:{label:'Clientes',icon:'users'},
+    orcamentos:{label:'Orçamentos',icon:'file-text'},
+    produtos:{label:'Produtos',icon:'package'},
+    fiado:{label:'Fiado',icon:'credit-card'},
+    caixa:{label:'Caixa',icon:'wallet'},
+    prolabore:{label:'Pró-Labore',icon:'piggy-bank'},
+    mei:{label:'MEI',icon:'file-check'},
+    historico:{label:'Histórico',icon:'clock'},
+    relatorio:{label:'Relatório',icon:'bar-chart-2'},
+    'rel-clientes':{label:'Rel. Clientes',icon:'trending-up'},
+    metas:{label:'Metas',icon:'target'},
+    calculadora:{label:'Calculadora',icon:'calculator'},
+    configuracoes:{label:'Config.',icon:'settings'}
+  };
+  window.crumbGoInicio=function(){showTab('painel',document.getElementById('navbtn-painel'));};
+  window.crumbGoParent=function(t){
+    if(t==='vendas')navSubTab('vendas','nova');
+    else if(t==='produtos')navSubTab('produtos','produtos');
   };
   function atualizarBreadcrumb(t,sub){
-    var info=crumbMap[t]||{grupo:null,label:t};
-    var partes=['Início'];
-    if(info.grupo)partes.push(info.grupo);
-    partes.push(info.label);
-    if(sub)partes.push(sub);
-    document.getElementById('page-crumb').innerHTML=partes.map(function(p,i){
-      var isLast=i===partes.length-1;
-      return (i>0?'<span class="sep">/</span>':'')+(isLast?'<b>'+p+'</b>':'<span>'+p+'</span>');
-    }).join('');
+    var info=crumbMap[t]||{label:t,icon:'circle'};
+    var finalLabel=sub||info.label;
+    var html='<button class="crumb-link" onclick="crumbGoInicio()">Início</button>';
+    if(sub){
+      html+='<span class="sep">/</span><button class="crumb-link" onclick="crumbGoParent(\''+t+'\')">'+info.label+'</button>';
+      html+='<span class="sep">/</span><b>'+sub+'</b>';
+    }else{
+      html+='<span class="sep">/</span><b>'+info.label+'</b>';
+    }
+    document.getElementById('page-crumb').innerHTML=html;
+    document.getElementById('page-title-iconwrap').innerHTML='<i data-lucide="'+info.icon+'"></i>';
+    document.getElementById('page-title-label').textContent=finalLabel;
+    if(window.lucide)lucide.createIcons();
   }
+  window.togglePanel=function(id,btn,label){
+    var el=document.getElementById(id);
+    var abrir=el.style.display==='none';
+    el.style.display=abrir?'':'none';
+    btn.innerHTML=abrir?'<i data-lucide="x"></i> Cancelar':'<i data-lucide="plus"></i> '+label;
+    if(abrir)el.scrollIntoView({behavior:'smooth',block:'nearest'});
+    if(window.lucide)lucide.createIcons();
+  };
+  window.abrirPanelForm=function(id,btnId){
+    var el=document.getElementById(id);if(!el)return;
+    el.style.display='';
+    var btn=document.getElementById(btnId);
+    if(btn){btn.innerHTML='<i data-lucide="x"></i> Cancelar';if(window.lucide)lucide.createIcons();}
+  };
   window.showTab=function(t,btn){
     document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
     document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('active');});
     document.getElementById('tab-'+t).classList.add('active');if(btn)btn.classList.add('active');
     atualizarBreadcrumb(t);
+    if(t!=='produtos'){
+      var buscaWrap=document.getElementById('busca-wrap'),buscaHome=document.getElementById('busca-home');
+      if(buscaWrap&&buscaHome)buscaHome.appendChild(buscaWrap);
+    }
     if(t==='vendas'||t==='produtos'){
       var childWrap=document.getElementById('navchildren-'+t),parentBtn=document.getElementById('navbtn-'+t);
       if(childWrap)childWrap.classList.add('open');
@@ -1388,13 +1436,16 @@ tbody tr:hover td{background:#fafbfc;}
   function mostrarSubVenda(tipo){
     document.getElementById('venda-sub-nova').style.display=tipo==='nova'?'block':'none';
     document.getElementById('venda-sub-devolucao').style.display=tipo==='devolucao'?'block':'none';
-    atualizarBreadcrumb('vendas',tipo==='devolucao'?'Devolução':null);
+    atualizarBreadcrumb('vendas',tipo==='devolucao'?'Devolução':'Registrar venda');
     if(tipo==='devolucao'){renderDevolucaoSelect();renderHistoricoDevolucoes();}
   }
   function mostrarSubProduto(tipo){
     document.getElementById('produto-sub-produtos').style.display=tipo==='produtos'?'block':'none';
     document.getElementById('produto-sub-movimentar').style.display=tipo==='movimentar'?'block':'none';
-    atualizarBreadcrumb('produtos',tipo==='movimentar'?'Movimentar estoque':null);
+    atualizarBreadcrumb('produtos',tipo==='movimentar'?'Movimentar estoque':'Gerenciar produtos');
+    var slot=document.getElementById('page-title-actions'),buscaWrap=document.getElementById('busca-wrap'),buscaHome=document.getElementById('busca-home');
+    if(tipo==='produtos'){if(buscaWrap&&slot)slot.appendChild(buscaWrap);}
+    else{if(buscaWrap&&buscaHome)buscaHome.appendChild(buscaWrap);}
     if(tipo==='movimentar')renderMovSelect();
   }
 
@@ -1568,6 +1619,7 @@ tbody tr:hover td{background:#fafbfc;}
   window.cancelarEdicao=function(){editId=null;document.getElementById('form-title').textContent='Cadastrar novo produto';['p-nome','p-sku','p-cat','p-preco','p-custo','p-qty','p-min'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('p-sugestoes-preco').style.display='none';};
   window.editarProduto=function(id){
     var p=dados.produtos.find(function(x){return x.id===id;});if(!p)return;
+    abrirPanelForm('panel-form-produto','btn-toggle-produto');
     editId=id;document.getElementById('p-nome').value=p.nome;document.getElementById('p-sku').value=p.sku||'';document.getElementById('p-cat').value=p.cat||'';document.getElementById('p-preco').value=p.preco;document.getElementById('p-custo').value=p.custo||0;document.getElementById('p-qty').value=p.qty;document.getElementById('p-min').value=p.min;
     document.getElementById('form-title').textContent='Editar produto';
     document.getElementById('p-sugestoes-preco').style.display='none';
@@ -1694,6 +1746,7 @@ tbody tr:hover td{background:#fafbfc;}
   window.fecharModalCliente=function(){document.getElementById('modal-cliente').classList.add('hidden');};
   window.editarCliente=function(id){
     var c=dados.clientes.find(function(x){return x.id===id;});if(!c)return;
+    abrirPanelForm('panel-form-cliente','btn-toggle-cliente');
     editCliId=id;document.getElementById('cli-nome').value=c.nome;document.getElementById('cli-cpf').value=c.cpf||'';document.getElementById('cli-tel').value=c.tel||'';document.getElementById('cli-email').value=c.email||'';document.getElementById('cli-nasc').value=c.nasc||'';document.getElementById('cli-cidade').value=c.cidade||'';document.getElementById('cli-end').value=c.end||'';
     document.getElementById('cli-form-title').textContent='Editar cliente';
     document.getElementById('tab-clientes').scrollIntoView({behavior:'smooth'});
@@ -1859,6 +1912,7 @@ tbody tr:hover td{background:#fafbfc;}
     itensVenda=v.itens.map(function(i){return Object.assign({},i);});
     showTab('vendas',document.getElementById('navbtn-vendas'));
     mostrarSubVenda('nova');
+    abrirPanelForm('panel-form-venda','btn-toggle-venda');
     var navChildNova=document.getElementById('navchild-vendas-nova');if(navChildNova)navChildNova.classList.add('active');
     document.getElementById('v-data').value=stringParaDataVenda(v.data);
     document.getElementById('v-cliente-sel').value=v.clienteId||'';
