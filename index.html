@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StockPro</title>
+<title>StockMei</title>
 <script src="https://cdn.jsdelivr.net/npm/lucide@1.23.0/dist/umd/lucide.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -23,11 +23,13 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 i[data-lucide],svg.lucide{width:18px;height:18px;stroke-width:2;flex-shrink:0;}
 
 /* AUTH */
-.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:linear-gradient(135deg,#4A86E8,#6FA0EC,#A8C5F5);}
-.auth-box{background:#fff;border-radius:20px;padding:2.5rem 2rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(30,27,75,0.25);}
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:linear-gradient(135deg,#4A86E8,#6FA0EC,#A8C5F5);position:relative;overflow:hidden;}
+#auth-bg-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block;}
+.auth-box{background:#fff;border-radius:20px;padding:2.5rem 2rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(30,27,75,0.25);position:relative;z-index:1;}
 .auth-logo{text-align:center;margin-bottom:1.5rem;}
 .auth-logo h1{font-size:24px;font-weight:500;color:var(--primary);margin-top:8px;letter-spacing:-0.01em;}
 .auth-logo p{font-size:13px;color:var(--text2);}
+.auth-logo-img-wrap{margin:0 auto;}
 .auth-tabs{display:flex;background:var(--surface2);border-radius:10px;padding:4px;margin-bottom:1.25rem;gap:4px;}
 .auth-tab{flex:1;background:none;border:none;padding:8px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text2);transition:all 0.15s;}
 .auth-tab.active{background:#fff;color:var(--primary);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
@@ -277,6 +279,11 @@ input[type="checkbox"]{accent-color:var(--red);}
   .modal{padding:1.25rem;}
   .notif-menu{position:fixed;top:var(--topbar-h);left:10px;right:10px;width:auto;max-width:none;border-radius:var(--radius);}
 }
+.table-wrap{scrollbar-width:thin;scrollbar-color:rgba(15,23,42,0.25) transparent;}
+.table-wrap::-webkit-scrollbar{height:7px;}
+.table-wrap::-webkit-scrollbar-track{background:transparent;}
+.table-wrap::-webkit-scrollbar-thumb{background:rgba(15,23,42,0.25);border-radius:99px;}
+.table-wrap::-webkit-scrollbar-thumb:hover{background:rgba(15,23,42,0.4);}
 </style>
 </head>
 <body>
@@ -288,10 +295,74 @@ input[type="checkbox"]{accent-color:var(--red);}
 
 <!-- AUTH -->
 <div class="auth-wrap" id="auth-wrap">
+  <canvas id="auth-bg-canvas"></canvas>
+  <script>
+  (function(){
+    var canvas=document.getElementById('auth-bg-canvas');
+    if(!canvas||!canvas.getContext)return;
+    var ctx=canvas.getContext('2d');
+    var wrap=canvas.parentElement;
+    var w=0,h=0,dots=[],mouse={x:null,y:null,active:false};
+    var COUNT=55,LINK_DIST=125,MOUSE_DIST=170;
+    function resize(){
+      w=canvas.width=wrap.offsetWidth;
+      h=canvas.height=wrap.offsetHeight;
+    }
+    function init(){
+      resize();
+      dots=[];
+      for(var i=0;i<COUNT;i++){
+        dots.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-0.5)*0.35,vy:(Math.random()-0.5)*0.35});
+      }
+    }
+    function step(){
+      if(wrap.offsetParent===null){requestAnimationFrame(step);return;}
+      ctx.clearRect(0,0,w,h);
+      dots.forEach(function(d){
+        d.x+=d.vx;d.y+=d.vy;
+        if(d.x<0||d.x>w)d.vx*=-1;
+        if(d.y<0||d.y>h)d.vy*=-1;
+      });
+      for(var i=0;i<dots.length;i++){
+        for(var j=i+1;j<dots.length;j++){
+          var dx=dots[i].x-dots[j].x,dy=dots[i].y-dots[j].y,dist=Math.sqrt(dx*dx+dy*dy);
+          if(dist<LINK_DIST){
+            ctx.strokeStyle='rgba(255,255,255,'+(0.16*(1-dist/LINK_DIST))+')';
+            ctx.lineWidth=1;
+            ctx.beginPath();ctx.moveTo(dots[i].x,dots[i].y);ctx.lineTo(dots[j].x,dots[j].y);ctx.stroke();
+          }
+        }
+        if(mouse.active){
+          var mdx=dots[i].x-mouse.x,mdy=dots[i].y-mouse.y,mdist=Math.sqrt(mdx*mdx+mdy*mdy);
+          if(mdist<MOUSE_DIST){
+            ctx.strokeStyle='rgba(255,255,255,'+(0.55*(1-mdist/MOUSE_DIST))+')';
+            ctx.lineWidth=1.3;
+            ctx.beginPath();ctx.moveTo(dots[i].x,dots[i].y);ctx.lineTo(mouse.x,mouse.y);ctx.stroke();
+          }
+        }
+        ctx.fillStyle='rgba(255,255,255,0.6)';
+        ctx.beginPath();ctx.arc(dots[i].x,dots[i].y,1.7,0,Math.PI*2);ctx.fill();
+      }
+      if(mouse.active){
+        ctx.fillStyle='rgba(255,255,255,0.85)';
+        ctx.beginPath();ctx.arc(mouse.x,mouse.y,2.6,0,Math.PI*2);ctx.fill();
+      }
+      requestAnimationFrame(step);
+    }
+    wrap.addEventListener('mousemove',function(e){
+      var rect=wrap.getBoundingClientRect();
+      mouse.x=e.clientX-rect.left;mouse.y=e.clientY-rect.top;mouse.active=true;
+    });
+    wrap.addEventListener('mouseleave',function(){mouse.active=false;});
+    window.addEventListener('resize',init);
+    init();
+    requestAnimationFrame(step);
+  })();
+  </script>
   <div class="auth-box">
     <div class="auth-logo">
-      <svg width="56" height="56" viewBox="0 0 44 44" style="margin:0 auto;display:block"><path d="M22 4 6 12v20l16 8 16-8V12L22 4Z" fill="none" stroke="#4A86E8" stroke-width="3" stroke-linejoin="round"/><path d="M6 12 22 20 38 12M22 20v20" stroke="#4A86E8" stroke-width="3" stroke-linejoin="round" fill="none"/></svg>
-      <h1>StockPro</h1><p>Gestão de varejo simplificada</p>
+      <div class="auth-logo-img-wrap"><svg width="56" height="56" viewBox="0 0 44 44" style="margin:0 auto;display:block"><path d="M22 4 6 12v20l16 8 16-8V12L22 4Z" fill="none" stroke="#4A86E8" stroke-width="3" stroke-linejoin="round"/><path d="M6 12 22 20 38 12M22 20v18" stroke="#4A86E8" stroke-width="3" stroke-linejoin="round" fill="none"/><circle cx="33" cy="30" r="9" fill="#fff"/><circle cx="33" cy="30" r="8" fill="#4A86E8"/><path d="M29 30 32 33 37.5 26.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><h1>StockMei</h1></div>
+      <p>Gestão de varejo simplificada</p>
     </div>
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchAuthTab('login',this)">Entrar</button>
@@ -332,7 +403,7 @@ input[type="checkbox"]{accent-color:var(--red);}
   <header class="topbar">
     <div style="display:flex;align-items:center">
       <button class="topbar-menu-btn" onclick="handleMenuBtnClick()"><i data-lucide="menu"></i></button>
-      <div class="topbar-brand"><span class="dot"><svg width="20" height="20" viewBox="0 0 44 44"><path d="M22 4 6 12v20l16 8 16-8V12L22 4Z" fill="none" stroke="#fff" stroke-width="4.5" stroke-linejoin="round"/><path d="M6 12 22 20 38 12M22 20v20" stroke="#fff" stroke-width="4.5" stroke-linejoin="round" fill="none"/></svg></span>StockPro</div>
+      <div class="topbar-brand"><span class="dot"><svg width="20" height="20" viewBox="0 0 44 44"><path d="M22 4 6 12v20l16 8 16-8V12L22 4Z" fill="none" stroke="#fff" stroke-width="4.5" stroke-linejoin="round"/><path d="M6 12 22 20 38 12M22 20v18" stroke="#fff" stroke-width="4.5" stroke-linejoin="round" fill="none"/><circle cx="33" cy="30" r="9.5" fill="#fff"/><path d="M29 30 32 33 37.5 26.5" stroke="#4A86E8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span>StockMei</div>
     </div>
     <div class="topbar-right">
       <div class="notif-wrap" id="notif-wrap">
@@ -361,10 +432,10 @@ input[type="checkbox"]{accent-color:var(--red);}
       <div class="sidebar-logo">
         <div class="sidebar-logo-img-wrap">
           <img id="sidebar-logo-img" class="sidebar-logo-img hidden" alt="Logo da empresa">
-          <svg id="sidebar-logo-default" width="34" height="34" viewBox="0 0 44 44"><path d="M22 4 6 12v20l16 8 16-8V12L22 4Z" fill="none" stroke="#4A86E8" stroke-width="3" stroke-linejoin="round"/><path d="M6 12 22 20 38 12M22 20v20" stroke="#4A86E8" stroke-width="3" stroke-linejoin="round" fill="none"/></svg>
+          <svg id="sidebar-logo-default" width="34" height="34" viewBox="0 0 44 44"><path d="M22 4 6 12v20l16 8 16-8V12L22 4Z" fill="none" stroke="#4A86E8" stroke-width="3" stroke-linejoin="round"/><path d="M6 12 22 20 38 12M22 20v18" stroke="#4A86E8" stroke-width="3" stroke-linejoin="round" fill="none"/><circle cx="33" cy="30" r="9" fill="#fff"/><circle cx="33" cy="30" r="8" fill="#4A86E8"/><path d="M29 30 32 33 37.5 26.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
         </div>
         <div class="sidebar-logo-info">
-          <h1 id="empresa-nome-display">StockPro</h1>
+          <h1 id="empresa-nome-display">StockMei</h1>
           <p id="empresa-sub-display"></p>
           <p id="empresa-cnpj-display"></p>
         </div>
@@ -1061,8 +1132,7 @@ input[type="checkbox"]{accent-color:var(--red);}
 <div class="auth-wrap hidden" id="paywall-wrap">
   <div class="auth-box" style="text-align:center">
     <div class="auth-logo">
-      <svg width="56" height="56" viewBox="0 0 44 44" style="margin:0 auto;display:block"><path d="M22 4 6 12v20l16 8 16-8V12L22 4Z" fill="none" stroke="#4A86E8" stroke-width="3" stroke-linejoin="round"/><path d="M6 12 22 20 38 12M22 20v20" stroke="#4A86E8" stroke-width="3" stroke-linejoin="round" fill="none"/></svg>
-      <h1>StockPro</h1>
+      <div class="auth-logo-img-wrap"><svg width="56" height="56" viewBox="0 0 44 44" style="margin:0 auto;display:block"><path d="M22 4 6 12v20l16 8 16-8V12L22 4Z" fill="none" stroke="#4A86E8" stroke-width="3" stroke-linejoin="round"/><path d="M6 12 22 20 38 12M22 20v18" stroke="#4A86E8" stroke-width="3" stroke-linejoin="round" fill="none"/><circle cx="33" cy="30" r="9" fill="#fff"/><circle cx="33" cy="30" r="8" fill="#4A86E8"/><path d="M29 30 32 33 37.5 26.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><h1>StockMei</h1></div>
     </div>
     <h3 id="paywall-titulo" style="margin:8px 0 6px">Assinatura pendente</h3>
     <p id="paywall-texto" style="font-size:13px;color:var(--text2);margin-bottom:18px;">Para continuar usando o sistema, finalize o pagamento da sua assinatura mensal.</p>
@@ -1340,7 +1410,7 @@ input[type="checkbox"]{accent-color:var(--red);}
 
   // ── CABEÇALHO / LOGO DA EMPRESA ───────────────────────
   function atualizarCabecalhoEmpresa(u){
-    var titulo=u.fantasia||u.empresa||'StockPro';
+    var titulo=u.fantasia||u.empresa||'StockMei';
     var sub=(u.fantasia&&u.empresa&&u.fantasia!==u.empresa)?u.empresa:'';
     if(!u.fantasia&&!u.empresa)sub='Gestão de varejo';
     document.getElementById('empresa-nome-display').textContent=titulo;
@@ -2456,8 +2526,8 @@ input[type="checkbox"]{accent-color:var(--red);}
   window.exportarPDF=function(){
     var res=document.getElementById('relatorio-resultado');if(res.style.display==='none'){alert('Gere o relatório primeiro.');return;}
     var win=window.open('','_blank');
-    win.document.write('<html><head><title>Relatório StockPro</title><style>body{font-family:system-ui,sans-serif;padding:2rem;color:#111;}h1{color:#6366f1;}h2{font-size:15px;margin-top:1.5rem;border-bottom:1px solid #e5e7eb;padding-bottom:6px;}table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;}th{background:#f3f4f6;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;}td{padding:8px;border-bottom:1px solid #f3f4f6;}.dre-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;}</style></head><body>');
-    win.document.write('<div style="display:flex;justify-content:space-between;margin-bottom:1.5rem"><div><h1>StockPro</h1><p>'+document.getElementById('empresa-nome-display').textContent+'</p></div><div style="text-align:right;font-size:12px;color:#6b7280"><p>'+new Date().toLocaleString('pt-BR')+'</p></div></div>');
+    win.document.write('<html><head><title>Relatório StockMei</title><style>body{font-family:system-ui,sans-serif;padding:2rem;color:#111;}h1{color:#6366f1;}h2{font-size:15px;margin-top:1.5rem;border-bottom:1px solid #e5e7eb;padding-bottom:6px;}table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;}th{background:#f3f4f6;padding:8px;text-align:left;font-size:11px;text-transform:uppercase;}td{padding:8px;border-bottom:1px solid #f3f4f6;}.dre-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;}</style></head><body>');
+    win.document.write('<div style="display:flex;justify-content:space-between;margin-bottom:1.5rem"><div><h1>StockMei</h1><p>'+document.getElementById('empresa-nome-display').textContent+'</p></div><div style="text-align:right;font-size:12px;color:#6b7280"><p>'+new Date().toLocaleString('pt-BR')+'</p></div></div>');
     win.document.write('<h2>DRE</h2>'+document.getElementById('dre-corpo').innerHTML);
     win.document.write('<h2>Vendas</h2><table><thead><tr><th>Data</th><th>Cliente</th><th>Pagamento</th><th>Total</th></tr></thead><tbody>'+document.getElementById('r-vendas-tbody').innerHTML+'</tbody></table>');
     win.document.write('<h2>Lucro por produto</h2>'+document.querySelector('#lucro-tbody').closest('table').outerHTML);
@@ -2496,7 +2566,7 @@ input[type="checkbox"]{accent-color:var(--red);}
     if(!rankCli.length){tb.innerHTML='<tr><td colspan="8"><div class="empty">Nenhum cliente com compras</div></td></tr>';return;}
     tb.innerHTML=rankCli.map(function(c,i){
       var tel=c.tel.replace(/\D/g,'');if(tel.length===11)tel='55'+tel;
-      var emp=usuarioAtual.fantasia||usuarioAtual.empresa||'StockPro';
+      var emp=usuarioAtual.fantasia||usuarioAtual.empresa||'StockMei';
       var msg='Olá '+c.nome+'! Aqui está seu resumo de compras na '+emp+': '+c.compras+' compra(s), total gasto: '+brl(c.total)+'. Obrigado pela preferência!';
       var waLink=c.tel?'https://wa.me/'+tel+'?text='+encodeURIComponent(msg):'';
       return '<tr><td style="font-weight:700;color:var(--primary)">'+(i===0?'1º':i===1?'2º':i===2?'3º':i+1)+'</td>'
@@ -2555,7 +2625,7 @@ input[type="checkbox"]{accent-color:var(--red);}
     var emp=usuarioAtual,parc=venda.parcelas&&venda.parcelas>1?venda.parcelas+'x de '+brl(venda.total/venda.parcelas):'À vista';
     var win=window.open('','_blank');
     win.document.write('<html><head><title>Recibo</title><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:system-ui,sans-serif;padding:1.5rem;max-width:380px;margin:0 auto;color:#111;}.logo{text-align:center;margin-bottom:1rem;}.logo h1{font-size:22px;font-weight:800;color:#6366f1;}.logo p{font-size:11px;color:#6b7280;}.div{border:none;border-top:1px dashed #d1d5db;margin:12px 0;}table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0;}th{text-align:left;font-size:11px;color:#6b7280;padding:4px 0;border-bottom:1px solid #e5e7eb;}td{padding:5px 0;border-bottom:1px solid #f3f4f6;}.tot{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin-top:12px;padding-top:8px;border-top:2px solid #111;}.foot{text-align:center;font-size:11px;color:#9ca3af;margin-top:16px;}</style></head><body>');
-    win.document.write('<div class="logo"><h1>StockPro</h1>');
+    win.document.write('<div class="logo"><h1>StockMei</h1>');
     if(emp.fantasia||emp.empresa)win.document.write('<p><strong>'+(emp.fantasia||emp.empresa)+'</strong></p>');
     if(emp.cnpj)win.document.write('<p>CNPJ: '+emp.cnpj+'</p>');
     win.document.write('</div><hr class="div">');
@@ -2568,7 +2638,7 @@ input[type="checkbox"]{accent-color:var(--red);}
     if(venda.desconto){win.document.write('<p style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:4px"><span>Subtotal</span><span>'+brl(venda.subtotal)+'</span></p><p style="font-size:12px;display:flex;justify-content:space-between;color:#ef4444;margin-bottom:4px"><span>Desconto</span><span>-'+brl(venda.desconto)+'</span></p>');}
     win.document.write('<div class="tot"><span>TOTAL</span><span>'+brl(venda.total)+'</span></div>');
     if(venda.pontos)win.document.write('<p style="font-size:12px;color:#f59e0b;margin-top:8px;text-align:center">+'+venda.pontos+' pontos</p>');
-    win.document.write('<hr class="div"><div class="foot"><p>Obrigado pela preferência!</p><p style="margin-top:4px">StockPro · Sistema de Gestão</p></div></body></html>');
+    win.document.write('<hr class="div"><div class="foot"><p>Obrigado pela preferência!</p><p style="margin-top:4px">StockMei · Sistema de Gestão</p></div></body></html>');
     win.document.close();setTimeout(function(){win.print();},400);
   }
 
@@ -2576,7 +2646,7 @@ input[type="checkbox"]{accent-color:var(--red);}
     var cli=dados.clientes.find(function(c){return c.id===venda.clienteId;});
     if(!cli||!cli.tel){alert('Este cliente não tem telefone cadastrado.');return;}
     var itens=venda.itens.map(function(i){return '• '+i.nome+' x'+i.qty+' = '+brl(i.preco*i.qty);}).join('\n');
-    var emp=usuarioAtual.fantasia||usuarioAtual.empresa||'StockPro';
+    var emp=usuarioAtual.fantasia||usuarioAtual.empresa||'StockMei';
     var msg='🧾 *Recibo de Compra*\n*'+emp+'*\n'+(usuarioAtual.cnpj?'CNPJ: '+usuarioAtual.cnpj+'\n':'')+'\n📅 '+venda.data+'\n👤 '+venda.cliente+'\n\n*Itens:*\n'+itens+'\n\n💳 '+venda.pagto+(venda.parcelas>1?' ('+venda.parcelas+'x de '+brl(venda.total/venda.parcelas)+')':'')+'\n\n💰 *Total: '+brl(venda.total)+'*'+(venda.pontos?'\n⭐ +'+venda.pontos+' pontos':'')+'\n\nObrigado pela preferência! 😊';
     var tel=cli.tel.replace(/\D/g,'');if(tel.length===11)tel='55'+tel;
     window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(msg),'_blank');
@@ -2726,7 +2796,7 @@ input[type="checkbox"]{accent-color:var(--red);}
     var c=dados.clientes.find(function(x){return x.id===clienteId;});
     if(!c||!c.tel){alert('Este cliente não tem telefone cadastrado.');return;}
     var saldo=calcularSaldoFiado(clienteId);
-    var emp=usuarioAtual.fantasia||usuarioAtual.empresa||'StockPro';
+    var emp=usuarioAtual.fantasia||usuarioAtual.empresa||'StockMei';
     var msg='Olá '+c.nome+'! Este é um lembrete de que você tem um saldo em aberto de '+brl(saldo)+' na '+emp+'. Qualquer dúvida, estamos à disposição!';
     var tel=c.tel.replace(/\D/g,'');if(tel.length===11)tel='55'+tel;
     window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(msg),'_blank');
@@ -2886,7 +2956,7 @@ input[type="checkbox"]{accent-color:var(--red);}
     win.document.write('<table><thead><tr><th>Mês</th><th style="text-align:right">Faturamento</th></tr></thead><tbody>'+linhas+'</tbody></table>');
     win.document.write('<div class="tot"><span>Total faturado em '+ano+'</span><span>'+brl(totalAno)+'</span></div>');
     win.document.write('<p style="margin-top:12px;font-size:13px;color:#6b7280">Limite anual MEI: '+brl(limite)+' ('+pct.toFixed(1)+'% utilizado)</p>');
-    win.document.write('<p style="margin-top:24px;font-size:12px;color:#9ca3af">Relatório gerado em '+new Date().toLocaleString('pt-BR')+' pelo StockPro. Use como apoio para a Declaração Anual do Simples Nacional (DASN-SIMEI).</p>');
+    win.document.write('<p style="margin-top:24px;font-size:12px;color:#9ca3af">Relatório gerado em '+new Date().toLocaleString('pt-BR')+' pelo StockMei. Use como apoio para a Declaração Anual do Simples Nacional (DASN-SIMEI).</p>');
     win.document.write('</body></html>');win.document.close();setTimeout(function(){win.print();},400);
   };
 
