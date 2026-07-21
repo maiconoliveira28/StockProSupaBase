@@ -284,6 +284,9 @@ input[type="checkbox"]{accent-color:var(--red);}
 .table-wrap::-webkit-scrollbar-track{background:transparent;}
 .table-wrap::-webkit-scrollbar-thumb{background:rgba(15,23,42,0.25);border-radius:99px;}
 .table-wrap::-webkit-scrollbar-thumb:hover{background:rgba(15,23,42,0.4);}
+.trial-banner{display:flex;align-items:center;justify-content:center;gap:14px;background:var(--primary-light);color:var(--primary-dark);font-size:13px;font-weight:600;padding:10px 16px;flex-wrap:wrap;text-align:center;border-radius:var(--radius-sm);margin-bottom:1.25rem;}
+.trial-banner button{background:var(--primary);color:#fff;border:none;padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+.trial-banner.hidden{display:none;}
 </style>
 </head>
 <body>
@@ -474,6 +477,10 @@ input[type="checkbox"]{accent-color:var(--red);}
     </aside>
 
     <div class="main-content">
+      <div id="trial-banner" class="trial-banner hidden">
+        <span id="trial-banner-texto"></span>
+        <button onclick="regularizarPagamento()">Assinar agora</button>
+      </div>
       <nav class="crumb" id="page-crumb"></nav>
       <div class="page-title-row">
         <h1 class="page-title-h"><span id="page-title-iconwrap"><i data-lucide="layout-dashboard"></i></span><span id="page-title-label">Painel</span></h1>
@@ -1227,6 +1234,7 @@ input[type="checkbox"]{accent-color:var(--red);}
   function fmtTel(v){v=v.replace(/\D/g,'').slice(0,11);if(v.length>6)v='('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7);else if(v.length>2)v='('+v.slice(0,2)+') '+v.slice(2);return v;}
   function fmtCpf(v){v=v.replace(/\D/g,'').slice(0,11);if(v.length>9)v=v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6,9)+'-'+v.slice(9);else if(v.length>6)v=v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6);else if(v.length>3)v=v.slice(0,3)+'.'+v.slice(3);return v;}
   function hojeISO(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function dataISOMaisDias(dias){var d=new Date();d.setDate(d.getDate()+dias);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   function dataVendaParaString(valorInput){
     if(!valorInput)return new Date().toLocaleString('pt-BR');
     var p=valorInput.split('-'),hora=new Date().toLocaleTimeString('pt-BR');
@@ -1286,7 +1294,7 @@ input[type="checkbox"]{accent-color:var(--red);}
     try{
       var exist=await sbGet('usuarios','email=eq.'+encodeURIComponent(email)+'&select=id');
       if(exist&&exist.length){showMsg('msg-cadastro','E-mail já cadastrado.','err');hideLoad();return;}
-      var novoUsuario={nome:nome,empresa:empresa,fantasia:fantasia,cnpj:cnpj,email:email,senha_hash:hash(senha),plano_status:'pendente'};
+      var novoUsuario={nome:nome,empresa:empresa,fantasia:fantasia,cnpj:cnpj,email:email,senha_hash:hash(senha),plano_status:'trial',trial_fim:dataISOMaisDias(7)};
       var nu=await sbPost('usuarios',novoUsuario);
       while(nu&&nu.code&&nu.message){
         var mColU=nu.message.match(/'([a-zA-Z_]+)'/);
@@ -1304,16 +1312,7 @@ input[type="checkbox"]{accent-color:var(--red);}
         criado=await sbPost('dados_usuario',novoDados);
       }
       ['c-nome','c-empresa','c-fantasia','c-cnpj','c-email','c-senha','c-senha2'].forEach(function(id){document.getElementById(id).value='';});
-      try{
-        var assinatura=await criarAssinatura(nu[0].id,email,nome);
-        if(assinatura&&assinatura.init_point){
-          showMsg('msg-cadastro','Conta criada! Redirecionando para o pagamento da assinatura...','ok');
-          hideLoad();
-          setTimeout(function(){window.location.href=assinatura.init_point;},1200);
-          return;
-        }
-      }catch(eAssin){}
-      showMsg('msg-cadastro','Conta criada! Faça login para continuar.','ok');
+      showMsg('msg-cadastro','Conta criada! Você tem 7 dias grátis. Faça login para começar.','ok');
       setTimeout(function(){switchAuthTab('login',document.querySelectorAll('.auth-tab')[0]);},1500);
     }catch(e){showMsg('msg-cadastro','Erro de conexão.','err');}
     hideLoad();
@@ -1372,10 +1371,12 @@ input[type="checkbox"]{accent-color:var(--red);}
       if(freshUser&&freshUser[0]){usuarioAtual=freshUser[0];localStorage.setItem(sessaoKey,JSON.stringify(freshUser[0]));}
     }catch(e){console.error(e);}
     hideLoad();
-    if(usuarioAtual.plano_status&&usuarioAtual.plano_status!=='ativo'){
+    var statusAtual=usuarioAtual.plano_status||'ativo';
+    if(statusAtual==='trial'&&(!usuarioAtual.trial_fim||usuarioAtual.trial_fim<hojeISO()))statusAtual='trial_expirado';
+    if(statusAtual!=='ativo'&&statusAtual!=='trial'){
       document.getElementById('auth-wrap').style.display='none';
       document.getElementById('app-wrap').style.display='none';
-      mostrarPaywall(usuarioAtual.plano_status);
+      mostrarPaywall(statusAtual);
       return;
     }
     document.getElementById('paywall-wrap').classList.add('hidden');
@@ -1388,12 +1389,23 @@ input[type="checkbox"]{accent-color:var(--red);}
       document.querySelector('.main-content').classList.add('sb-collapsed');
     }
     itensVenda=[];renderPainel();
+    atualizarTrialBanner();
+  }
+
+  function atualizarTrialBanner(){
+    var banner=document.getElementById('trial-banner');
+    if((usuarioAtual.plano_status||'ativo')!=='trial'||!usuarioAtual.trial_fim){banner.classList.add('hidden');return;}
+    var fim=new Date(usuarioAtual.trial_fim+'T00:00:00'),hoje=new Date(hojeISO()+'T00:00:00');
+    var dias=Math.max(0,Math.round((fim-hoje)/86400000));
+    document.getElementById('trial-banner-texto').textContent=dias<=0?'Último dia do seu teste grátis.':dias===1?'Resta 1 dia do seu teste grátis.':'Restam '+dias+' dias do seu teste grátis.';
+    banner.classList.remove('hidden');
   }
 
   function mostrarPaywall(status){
     var titulo=document.getElementById('paywall-titulo'),texto=document.getElementById('paywall-texto');
     if(status==='cancelado'){titulo.textContent='Assinatura cancelada';texto.textContent='Sua assinatura foi cancelada. Para voltar a usar o sistema, assine novamente.';}
     else if(status==='atrasado'){titulo.textContent='Pagamento em atraso';texto.textContent='Identificamos um problema no pagamento da sua assinatura. Regularize para continuar usando o sistema.';}
+    else if(status==='trial_expirado'){titulo.textContent='Teste grátis encerrado';texto.textContent='Seu teste grátis de 7 dias acabou. Assine para continuar usando o StockMei.';}
     else{titulo.textContent='Assinatura pendente';texto.textContent='Finalize o pagamento da sua assinatura mensal para começar a usar o sistema.';}
     document.getElementById('paywall-msg').style.display='none';
     document.getElementById('paywall-wrap').classList.remove('hidden');
@@ -3195,13 +3207,17 @@ input[type="checkbox"]{accent-color:var(--red);}
   function renderAssinaturaConfig(){
     var info=document.getElementById('assinatura-info'),btns=document.getElementById('assinatura-btns');
     var status=usuarioAtual.plano_status||'ativo';
-    var labels={ativo:'Ativa',pendente:'Pendente de pagamento',atrasado:'Pagamento atrasado',cancelado:'Cancelada'};
+    var labels={ativo:'Ativa',trial:'Teste grátis',pendente:'Pendente de pagamento',atrasado:'Pagamento atrasado',cancelado:'Cancelada'};
     var html='<p style="font-size:13px;color:var(--text2);margin-bottom:6px;">Status: <strong>'+(labels[status]||status)+'</strong></p>';
+    if(status==='trial'&&usuarioAtual.trial_fim)html+='<p style="font-size:13px;color:var(--text2);margin-bottom:6px;">Teste grátis até: '+new Date(usuarioAtual.trial_fim+'T00:00:00').toLocaleDateString('pt-BR')+'</p>';
     if(usuarioAtual.plano_valor)html+='<p style="font-size:13px;color:var(--text2);margin-bottom:6px;">Mensalidade: '+brl(usuarioAtual.plano_valor)+'</p>';
     if(status==='ativo'&&usuarioAtual.proximo_vencimento)html+='<p style="font-size:13px;color:var(--text2);">Próxima cobrança: '+new Date(usuarioAtual.proximo_vencimento+'T00:00:00').toLocaleDateString('pt-BR')+'</p>';
     info.innerHTML=html;
     btns.innerHTML='';
-    if(usuarioAtual.mp_preapproval_id&&(status==='ativo'||status==='atrasado')){
+    if(status==='trial'){
+      btns.innerHTML='<button class="btn" onclick="regularizarPagamento()"><i data-lucide="credit-card"></i> Assinar agora</button>';
+      if(window.lucide)lucide.createIcons();
+    }else if(usuarioAtual.mp_preapproval_id&&(status==='ativo'||status==='atrasado')){
       btns.innerHTML='<button class="btn danger" onclick="cancelarAssinatura()"><i data-lucide="x-circle"></i> Cancelar assinatura</button>';
       if(window.lucide)lucide.createIcons();
     }
