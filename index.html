@@ -1329,9 +1329,6 @@ input[type="checkbox"]{accent-color:var(--red);}
   var SB_URL='https://flcwhdrzlvrughatitxx.supabase.co';
   var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZsY3doZHJ6bHZydWdoYXRpdHh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjU5OTUsImV4cCI6MjA5ODQwMTk5NX0.KqcH-6GdPdXOw28uQi2-GYxPpnxrMliudtoSIVMvJhA';
 
-  function sbGet(table,query){return fetch(SB_URL+'/rest/v1/'+table+'?'+query,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}).then(function(r){return r.json();});}
-  function sbPost(table,body){return fetch(SB_URL+'/rest/v1/'+table,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)}).then(function(r){return r.json();});}
-  function sbPatch(table,query,body){return fetch(SB_URL+'/rest/v1/'+table+'?'+query,{method:'PATCH',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)}).then(function(r){return r.json();});}
   function criarAssinatura(usuarioId,email,nome){
     return fetch(SB_URL+'/functions/v1/criar-assinatura',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({usuario_id:usuarioId,email:email,nome:nome})}).then(function(r){return r.json();});
   }
@@ -1363,6 +1360,12 @@ input[type="checkbox"]{accent-color:var(--red);}
 
   var sessaoKey='stockpro_sessao';
   var usuarioAtual=null;
+  var sessaoToken=null;
+  function chamarFn(nome,body){
+    return fetch(SB_URL+'/functions/v1/'+nome,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)})
+      .then(function(r){return r.json().then(function(j){return {status:r.status,body:j};});});
+  }
+  function salvarSessaoLocal(){localStorage.setItem(sessaoKey,JSON.stringify({token:sessaoToken,usuario:usuarioAtual}));}
   var dados={produtos:[],historico:[],vendas:[],orcamentos:[],devolucoes:[],clientes:[],caixas:[],das:[],metas:[],fiados:[],prolabore:[],notificacoes:[]};
   var dadosId=null;
   var vendasMap={};
@@ -1372,17 +1375,11 @@ input[type="checkbox"]{accent-color:var(--red);}
 
   // ── SUPABASE ──────────────────────────────────────────
   function salvar(){
-    var payload={produtos:dados.produtos,vendas:dados.vendas,orcamentos:dados.orcamentos,devolucoes:dados.devolucoes,historico:dados.historico,clientes:dados.clientes,caixas:dados.caixas,das:dados.das,metas:dados.metas,fiados:dados.fiados,prolabore:dados.prolabore,notificacoes:dados.notificacoes,updated_at:new Date().toISOString()};
-    function tentar(){
-      return sbPatch('dados_usuario','usuario_id=eq.'+usuarioAtual.id,payload).then(function(res){
-        if(res&&res.code==='PGRST204'&&res.message){
-          var m=res.message.match(/'([a-zA-Z_]+)'/);
-          if(m&&Object.prototype.hasOwnProperty.call(payload,m[1])){delete payload[m[1]];return tentar();}
-        }
-        return res;
-      });
-    }
-    return tentar();
+    var payload={produtos:dados.produtos,vendas:dados.vendas,orcamentos:dados.orcamentos,devolucoes:dados.devolucoes,historico:dados.historico,clientes:dados.clientes,caixas:dados.caixas,das:dados.das,metas:dados.metas,fiados:dados.fiados,prolabore:dados.prolabore,notificacoes:dados.notificacoes};
+    return chamarFn('dados',{action:'save',token:sessaoToken,payload:payload}).then(function(r){
+      if(r.status===401)fazerLogout();
+      return r.body;
+    });
   }
 
   // ── AUTH ──────────────────────────────────────────────
@@ -1403,25 +1400,8 @@ input[type="checkbox"]{accent-color:var(--red);}
     if(senha!==senha2){showMsg('msg-cadastro','As senhas não coincidem.','err');return;}
     showLoad();
     try{
-      var exist=await sbGet('usuarios','email=eq.'+encodeURIComponent(email)+'&select=id');
-      if(exist&&exist.length){showMsg('msg-cadastro','E-mail já cadastrado.','err');hideLoad();return;}
-      var novoUsuario={nome:nome,empresa:empresa,fantasia:fantasia,cnpj:cnpj,email:email,senha_hash:hash(senha),plano_status:'trial',trial_fim:dataISOMaisDias(7)};
-      var nu=await sbPost('usuarios',novoUsuario);
-      while(nu&&nu.code&&nu.message){
-        var mColU=nu.message.match(/'([a-zA-Z_]+)'/);
-        if(!mColU||!Object.prototype.hasOwnProperty.call(novoUsuario,mColU[1]))break;
-        delete novoUsuario[mColU[1]];
-        nu=await sbPost('usuarios',novoUsuario);
-      }
-      if(!nu||!nu[0]){showMsg('msg-cadastro','Erro ao criar conta.','err');hideLoad();return;}
-      var novoDados={usuario_id:nu[0].id,produtos:[],vendas:[],orcamentos:[],devolucoes:[],historico:[],clientes:[],caixas:[],das:[],metas:[],fiados:[],prolabore:[],notificacoes:[]};
-      var criado=await sbPost('dados_usuario',novoDados);
-      while(criado&&criado.code&&criado.message){
-        var mCol=criado.message.match(/'([a-zA-Z_]+)'/);
-        if(!mCol||!Object.prototype.hasOwnProperty.call(novoDados,mCol[1]))break;
-        delete novoDados[mCol[1]];
-        criado=await sbPost('dados_usuario',novoDados);
-      }
+      var r=await chamarFn('auth',{action:'cadastro',nome:nome,empresa:empresa,fantasia:fantasia,cnpj:cnpj,email:email,senha:senha});
+      if(r.body&&r.body.error){showMsg('msg-cadastro',r.body.error,'err');hideLoad();return;}
       ['c-nome','c-empresa','c-fantasia','c-cnpj','c-email','c-senha','c-senha2'].forEach(function(id){document.getElementById(id).value='';});
       showMsg('msg-cadastro','Conta criada! Você tem 7 dias grátis. Faça login para começar.','ok');
       setTimeout(function(){switchAuthTab('login',document.querySelectorAll('.auth-tab')[0]);},1500);
@@ -1434,10 +1414,11 @@ input[type="checkbox"]{accent-color:var(--red);}
     if(!email||!senha){showMsg('msg-login','Preencha e-mail e senha.','err');return;}
     showLoad();
     try{
-      var res=await sbGet('usuarios','email=eq.'+encodeURIComponent(email)+'&senha_hash=eq.'+encodeURIComponent(hash(senha))+'&select=*');
-      if(!res||!res.length){showMsg('msg-login','E-mail ou senha incorretos.','err');hideLoad();return;}
-      localStorage.setItem(sessaoKey,JSON.stringify(res[0]));
-      await iniciarApp(res[0]);
+      var r=await chamarFn('auth',{action:'login',email:email,senha:senha});
+      if(r.body&&r.body.error){showMsg('msg-login',r.body.error,'err');hideLoad();return;}
+      sessaoToken=r.body.token;usuarioAtual=r.body.usuario;
+      salvarSessaoLocal();
+      await iniciarApp(usuarioAtual,sessaoToken);
     }catch(e){showMsg('msg-login','Erro de conexão.','err');}
     hideLoad();
   };
@@ -1449,9 +1430,8 @@ input[type="checkbox"]{accent-color:var(--red);}
     if(nova!==nova2){showMsg('msg-recuperar','As senhas não coincidem.','err');return;}
     showLoad();
     try{
-      var exist=await sbGet('usuarios','email=eq.'+encodeURIComponent(email)+'&select=id');
-      if(!exist||!exist.length){showMsg('msg-recuperar','E-mail não encontrado.','err');hideLoad();return;}
-      await sbPatch('usuarios','email=eq.'+encodeURIComponent(email),{senha_hash:hash(nova)});
+      var r=await chamarFn('auth',{action:'recuperar-senha',email:email,novaSenha:nova});
+      if(r.body&&r.body.error){showMsg('msg-recuperar',r.body.error,'err');hideLoad();return;}
       showMsg('msg-recuperar','Senha redefinida! Faça login.','ok');
       ['r-email','r-nova','r-nova2'].forEach(function(id){document.getElementById(id).value='';});
       setTimeout(function(){switchAuthTab('login',document.querySelectorAll('.auth-tab')[0]);},1500);
@@ -1460,7 +1440,7 @@ input[type="checkbox"]{accent-color:var(--red);}
   };
 
   window.fazerLogout=function(){
-    localStorage.removeItem(sessaoKey);usuarioAtual=null;
+    localStorage.removeItem(sessaoKey);usuarioAtual=null;sessaoToken=null;
     dados={produtos:[],historico:[],vendas:[],orcamentos:[],devolucoes:[],clientes:[],caixas:[],das:[],metas:[],fiados:[],prolabore:[],notificacoes:[]};dadosId=null;
     document.getElementById('app-wrap').style.display='none';document.getElementById('auth-wrap').style.display='flex';
     document.getElementById('l-email').value='';document.getElementById('l-senha').value='';
@@ -1468,18 +1448,19 @@ input[type="checkbox"]{accent-color:var(--red);}
     document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});document.getElementById('tab-painel').classList.add('active');
   };
 
-  async function iniciarApp(user){
-    usuarioAtual=user;showLoad();
+  async function iniciarApp(user,token){
+    usuarioAtual=user;sessaoToken=token;showLoad();
     dados={produtos:[],historico:[],vendas:[],orcamentos:[],devolucoes:[],clientes:[],caixas:[],das:[],metas:[],fiados:[],prolabore:[],notificacoes:[]};dadosId=null;
     try{
-      var res=await sbGet('dados_usuario','usuario_id=eq.'+user.id+'&select=*');
+      var r=await chamarFn('dados',{action:'get',token:token});
+      if(r.status===401){hideLoad();fazerLogout();return;}
+      var res=r.body.dados?[r.body.dados]:[];
       if(res&&res.length){
         dadosId=res[0].id;
         dados.produtos=res[0].produtos||[];dados.vendas=res[0].vendas||[];dados.orcamentos=res[0].orcamentos||[];
         dados.devolucoes=res[0].devolucoes||[];dados.historico=res[0].historico||[];dados.clientes=res[0].clientes||[];dados.caixas=res[0].caixas||[];dados.das=res[0].das||[];dados.metas=res[0].metas||[];dados.fiados=res[0].fiados||[];dados.prolabore=res[0].prolabore||[];dados.notificacoes=res[0].notificacoes||[];
       }
-      var freshUser=await sbGet('usuarios','id=eq.'+user.id+'&select=*');
-      if(freshUser&&freshUser[0]){usuarioAtual=freshUser[0];localStorage.setItem(sessaoKey,JSON.stringify(freshUser[0]));}
+      if(r.body.usuario){usuarioAtual=r.body.usuario;salvarSessaoLocal();}
     }catch(e){console.error(e);}
     hideLoad();
     var statusAtual=usuarioAtual.plano_status||'ativo';
@@ -1565,13 +1546,12 @@ input[type="checkbox"]{accent-color:var(--red);}
         var dataUrl=canvas.toDataURL('image/jpeg',0.85);
         showLoad();
         try{
-          var res=await sbPatch('usuarios','id=eq.'+usuarioAtual.id,{logo:dataUrl});
-          if(res&&res.code)throw new Error(res.message||'Erro ao salvar');
-          usuarioAtual.logo=dataUrl;
-          localStorage.setItem(sessaoKey,JSON.stringify(usuarioAtual));
+          var r=await chamarFn('perfil',{action:'atualizar',token:sessaoToken,logo:dataUrl});
+          if(r.body&&r.body.error)throw new Error(r.body.error);
+          usuarioAtual=r.body.usuario;salvarSessaoLocal();
           atualizarPreviewLogoCfg(dataUrl);setSidebarLogo(dataUrl);
           showFb('cfg-fb4','Logo atualizada!','ok');
-        }catch(err){showFb('cfg-fb4','Erro ao salvar a logo. Verifique se a coluna "logo" existe na tabela usuarios.','err');}
+        }catch(err){showFb('cfg-fb4','Erro ao salvar a logo.','err');}
         hideLoad();
       };
       img.src=e.target.result;
@@ -1581,17 +1561,16 @@ input[type="checkbox"]{accent-color:var(--red);}
   window.removerLogoEmpresa=async function(){
     showLoad();
     try{
-      var res=await sbPatch('usuarios','id=eq.'+usuarioAtual.id,{logo:null});
-      if(res&&res.code)throw new Error(res.message||'Erro ao remover');
-      usuarioAtual.logo=null;
-      localStorage.setItem(sessaoKey,JSON.stringify(usuarioAtual));
+      var r=await chamarFn('perfil',{action:'atualizar',token:sessaoToken,logo:null});
+      if(r.body&&r.body.error)throw new Error(r.body.error);
+      usuarioAtual=r.body.usuario;salvarSessaoLocal();
       atualizarPreviewLogoCfg(null);setSidebarLogo(null);
       showFb('cfg-fb4','Logo removida.','ok');
     }catch(err){showFb('cfg-fb4','Erro ao remover a logo.','err');}
     hideLoad();
   };
 
-  (async function(){var s=localStorage.getItem(sessaoKey);if(s){try{var u=JSON.parse(s);if(u&&u.id)await iniciarApp(u);}catch(e){}}})();
+  (async function(){var s=localStorage.getItem(sessaoKey);if(s){try{var d=JSON.parse(s);if(d&&d.token&&d.usuario&&d.usuario.id)await iniciarApp(d.usuario,d.token);}catch(e){}}})();
 
   // ── TABS ──────────────────────────────────────────────
   var crumbMap={
@@ -2987,12 +2966,11 @@ input[type="checkbox"]{accent-color:var(--red);}
   window.ativarMei=async function(){
     showLoad();
     try{
-      var res=await sbPatch('usuarios','id=eq.'+usuarioAtual.id,{mei_ativo:true});
-      if(res&&res.code)throw new Error(res.message||'Erro ao ativar');
-      usuarioAtual.mei_ativo=true;
-      localStorage.setItem(sessaoKey,JSON.stringify(usuarioAtual));
+      var r=await chamarFn('perfil',{action:'atualizar',token:sessaoToken,mei_ativo:true});
+      if(r.body&&r.body.error)throw new Error(r.body.error);
+      usuarioAtual=r.body.usuario;salvarSessaoLocal();
       renderMei();renderPainel();
-    }catch(err){alert('Não foi possível ativar o modo MEI. Verifique se a coluna mei_ativo existe na tabela usuarios.');}
+    }catch(err){alert('Não foi possível ativar o modo MEI.');}
     hideLoad();
   };
 
@@ -3089,13 +3067,12 @@ input[type="checkbox"]{accent-color:var(--red);}
     var limite=parseFloat(document.getElementById('cfg-mei-limite').value)||81000;
     showLoad();
     try{
-      var res=await sbPatch('usuarios','id=eq.'+usuarioAtual.id,{mei_ativo:ativo,mei_categoria:cat,mei_limite:limite});
-      if(res&&res.code)throw new Error(res.message||'Erro ao salvar');
-      Object.assign(usuarioAtual,{mei_ativo:ativo,mei_categoria:cat,mei_limite:limite});
-      localStorage.setItem(sessaoKey,JSON.stringify(usuarioAtual));
+      var r=await chamarFn('perfil',{action:'atualizar',token:sessaoToken,mei_ativo:ativo,mei_categoria:cat,mei_limite:limite});
+      if(r.body&&r.body.error)throw new Error(r.body.error);
+      usuarioAtual=r.body.usuario;salvarSessaoLocal();
       showFb('cfg-fb5','Configurações MEI salvas!','ok');
       renderPainel();
-    }catch(err){showFb('cfg-fb5','Erro ao salvar. Verifique se as colunas mei_ativo/mei_categoria/mei_limite existem na tabela usuarios.','err');}
+    }catch(err){showFb('cfg-fb5','Erro ao salvar.','err');}
     hideLoad();
   };
   window.toggleMeiAtivoUI=function(){
@@ -3121,10 +3098,9 @@ input[type="checkbox"]{accent-color:var(--red);}
     };
     showLoad();
     try{
-      var res=await sbPatch('usuarios','id=eq.'+usuarioAtual.id,{fidelidade_config:cfg});
-      if(res&&res.code)throw new Error(res.message||'Erro ao salvar');
-      usuarioAtual.fidelidade_config=cfg;
-      localStorage.setItem(sessaoKey,JSON.stringify(usuarioAtual));
+      var r=await chamarFn('perfil',{action:'atualizar',token:sessaoToken,fidelidade_config:cfg});
+      if(r.body&&r.body.error)throw new Error(r.body.error);
+      usuarioAtual=r.body.usuario;salvarSessaoLocal();
       showFb('cfg-fb6','Configurações de fidelidade salvas!','ok');
       renderClientes();
     }catch(err){showFb('cfg-fb6','Erro ao salvar. Verifique se a coluna fidelidade_config existe na tabela usuarios.','err');}
@@ -3241,13 +3217,12 @@ input[type="checkbox"]{accent-color:var(--red);}
     cfgAtual.metaMensal=meta;
     showLoad();
     try{
-      var res=await sbPatch('usuarios','id=eq.'+usuarioAtual.id,{prolabore_config:cfgAtual});
-      if(res&&res.code)throw new Error(res.message||'Erro ao salvar');
-      usuarioAtual.prolabore_config=cfgAtual;
-      localStorage.setItem(sessaoKey,JSON.stringify(usuarioAtual));
+      var r=await chamarFn('perfil',{action:'atualizar',token:sessaoToken,prolabore_config:cfgAtual});
+      if(r.body&&r.body.error)throw new Error(r.body.error);
+      usuarioAtual=r.body.usuario;salvarSessaoLocal();
       showFb('pl-meta-feedback','Meta salva!','ok');
       renderProlabore();
-    }catch(err){showFb('pl-meta-feedback','Erro ao salvar a meta. Verifique se a coluna prolabore_config existe na tabela usuarios.','err');}
+    }catch(err){showFb('pl-meta-feedback','Erro ao salvar a meta.','err');}
     hideLoad();
   };
   function renderProlaboreHistorico(){
@@ -3307,12 +3282,11 @@ input[type="checkbox"]{accent-color:var(--red);}
     };
     showLoad();
     try{
-      var res=await sbPatch('usuarios','id=eq.'+usuarioAtual.id,{prolabore_config:cfg});
-      if(res&&res.code)throw new Error(res.message||'Erro ao salvar');
-      usuarioAtual.prolabore_config=cfg;
-      localStorage.setItem(sessaoKey,JSON.stringify(usuarioAtual));
+      var r=await chamarFn('perfil',{action:'atualizar',token:sessaoToken,prolabore_config:cfg});
+      if(r.body&&r.body.error)throw new Error(r.body.error);
+      usuarioAtual=r.body.usuario;salvarSessaoLocal();
       showFb('cfg-fb8','Configurações de pró-labore salvas!','ok');
-    }catch(err){showFb('cfg-fb8','Erro ao salvar. Verifique se a coluna prolabore_config existe na tabela usuarios.','err');}
+    }catch(err){showFb('cfg-fb8','Erro ao salvar.','err');}
     hideLoad();
   };
   function renderAssinaturaConfig(){
@@ -3341,7 +3315,7 @@ input[type="checkbox"]{accent-color:var(--red);}
       hideLoad();
       if(res&&res.ok){
         usuarioAtual.plano_status='cancelado';
-        localStorage.setItem(sessaoKey,JSON.stringify(usuarioAtual));
+        salvarSessaoLocal();
         document.getElementById('app-wrap').style.display='none';
         mostrarPaywall('cancelado');
       }else{
@@ -3354,12 +3328,15 @@ input[type="checkbox"]{accent-color:var(--red);}
     if(!nome||!empresa){showFb('cfg-fb1','Nome e razão social obrigatórios.','err');return;}
     showLoad();
     var fantasia=document.getElementById('cfg-fantasia').value.trim(),cnpj=document.getElementById('cfg-cnpj').value.trim();
-    await sbPatch('usuarios','id=eq.'+usuarioAtual.id,{nome:nome,empresa:empresa,fantasia:fantasia,cnpj:cnpj});
-    Object.assign(usuarioAtual,{nome:nome,empresa:empresa,fantasia:fantasia,cnpj:cnpj});
-    localStorage.setItem(sessaoKey,JSON.stringify(usuarioAtual));
-    atualizarTopbarUsuario(nome);
-    atualizarCabecalhoEmpresa(usuarioAtual);
-    hideLoad();showFb('cfg-fb1','Dados atualizados!','ok');
+    try{
+      var r=await chamarFn('perfil',{action:'atualizar',token:sessaoToken,nome:nome,empresa:empresa,fantasia:fantasia,cnpj:cnpj});
+      if(r.body&&r.body.error)throw new Error(r.body.error);
+      usuarioAtual=r.body.usuario;salvarSessaoLocal();
+      atualizarTopbarUsuario(nome);
+      atualizarCabecalhoEmpresa(usuarioAtual);
+      showFb('cfg-fb1','Dados atualizados!','ok');
+    }catch(err){showFb('cfg-fb1','Erro ao salvar.','err');}
+    hideLoad();
   };
   window.alterarSenha=async function(){
     var atual=document.getElementById('cfg-senha-atual').value,nova=document.getElementById('cfg-senha-nova').value,nova2=document.getElementById('cfg-senha-nova2').value;
@@ -3367,9 +3344,8 @@ input[type="checkbox"]{accent-color:var(--red);}
     if(nova.length<6){showFb('cfg-fb2','Senha mínimo 6 caracteres.','err');return;}
     if(nova!==nova2){showFb('cfg-fb2','As senhas não coincidem.','err');return;}
     showLoad();
-    var res=await sbGet('usuarios','id=eq.'+usuarioAtual.id+'&senha_hash=eq.'+encodeURIComponent(hash(atual))+'&select=id');
-    if(!res||!res.length){showFb('cfg-fb2','Senha atual incorreta.','err');hideLoad();return;}
-    await sbPatch('usuarios','id=eq.'+usuarioAtual.id,{senha_hash:hash(nova)});
+    var r=await chamarFn('perfil',{action:'trocar-senha',token:sessaoToken,senhaAtual:atual,novaSenha:nova});
+    if(r.body&&r.body.error){showFb('cfg-fb2',r.body.error,'err');hideLoad();return;}
     ['cfg-senha-atual','cfg-senha-nova','cfg-senha-nova2'].forEach(function(id){document.getElementById(id).value='';});
     hideLoad();showFb('cfg-fb2','Senha alterada!','ok');
   };
