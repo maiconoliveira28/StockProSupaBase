@@ -8,6 +8,8 @@
 <script src="https://cdn.jsdelivr.net/npm/lucide@1.23.0/dist/umd/lucide.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+#funcionalidades,#como-funciona,#preco,#faq{scroll-margin-top:84px;}
 :root{
   --bg:#F1F6FE;--surface:#fff;--text:#0f172a;--text2:#64748b;--text3:#94a3b8;
   --primary:#4A86E8;--primary-dark:#3568C7;--primary-light:#EAF1FE;
@@ -69,6 +71,21 @@ i[data-lucide]{width:20px;height:20px;stroke-width:2;flex-shrink:0;}
 .mock-row .ic i{width:14px;height:14px;color:var(--primary);}
 .mock-row .name{flex:1;font-weight:600;color:var(--text);}
 .mock-row .amt{font-weight:700;color:var(--green);}
+.mock-row .amt.neg{color:var(--red);}
+.showcase-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;max-width:720px;margin:0 auto;}
+.mock-card.mini{transform:none;padding:20px;}
+.mock-total-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800;color:var(--text);padding-top:12px;margin-top:10px;border-top:1px solid rgba(15,23,42,0.08);}
+.mock-total-row span:last-child{color:var(--primary-dark);}
+.mock-total-row span:last-child.pos{color:var(--green);}
+.mock-stock-list{display:flex;flex-direction:column;gap:11px;}
+.mock-stock-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--text);font-weight:600;}
+.badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;}
+.badge.ok{background:var(--green-light);color:#067a55;}
+.badge.warn{background:var(--orange-light);color:#a15c07;}
+.badge.danger{background:var(--red-light);color:#b91c1c;}
+.mock-cart{margin-bottom:2px;}
+.mock-cart-row{display:flex;justify-content:space-between;font-size:13px;color:var(--text);padding:7px 0;border-top:1px solid rgba(15,23,42,0.06);}
+.mock-cart-row:first-child{border-top:none;padding-top:0;}
 
 /* SECTIONS */
 section{padding:80px 0;}
@@ -136,6 +153,7 @@ footer{padding:48px 0 32px;border-top:1px solid rgba(15,23,42,0.07);margin-top:2
   .hero h1{font-size:32px;}
   .mock-card{transform:none;max-width:420px;margin:0 auto;}
   .features-grid{grid-template-columns:repeat(2,1fr);}
+  .showcase-grid{grid-template-columns:repeat(2,1fr);max-width:520px;}
   .steps{grid-template-columns:1fr;gap:36px;}
   .nav-links{display:none;}
 }
@@ -146,6 +164,7 @@ footer{padding:48px 0 32px;border-top:1px solid rgba(15,23,42,0.07);margin-top:2
   .hero p.lead{font-size:15px;}
   .section-head h2{font-size:25px;}
   .features-grid{grid-template-columns:1fr;}
+  .showcase-grid{grid-template-columns:1fr;max-width:340px;}
   .nav-actions .btn-ghost{display:none;}
   .cta-banner{margin:0 12px;padding:40px 20px;}
   .cta-banner h2{font-size:22px;}
@@ -229,6 +248,51 @@ footer{padding:48px 0 32px;border-top:1px solid rgba(15,23,42,0.07);margin-top:2
       <div class="feature-card"><div class="feature-ic"><i data-lucide="banknote"></i></div><h3>Pró-labore</h3><p>Planeje sua própria retirada como dono do negócio, sem misturar com o caixa da empresa.</p></div>
       <div class="feature-card"><div class="feature-ic"><i data-lucide="bell"></i></div><h3>Notificações Inteligentes</h3><p>Avisos automáticos de metas batidas, limite do MEI e vencimento do DAS.</p></div>
       <div class="feature-card"><div class="feature-ic"><i data-lucide="smartphone"></i></div><h3>Em Qualquer Lugar</h3><p>Acesse do computador, tablet ou celular — os dados ficam sempre sincronizados.</p></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--surface);">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">Por dentro do sistema</div>
+      <h2>Veja como é usar na prática</h2>
+      <p>Sem enrolação: é isso que você vê no dia a dia dentro do StockMei.</p>
+    </div>
+    <div class="showcase-grid">
+      <div class="mock-card mini">
+        <div class="mock-topbar"><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-title">CAIXA — HOJE</span></div>
+        <div class="mock-rows">
+          <div class="mock-row"><span class="ic"><i data-lucide="arrow-down-circle"></i></span><span class="name">Venda balcão</span><span class="amt">+R$ 120,00</span></div>
+          <div class="mock-row"><span class="ic"><i data-lucide="arrow-up-circle"></i></span><span class="name">Pagamento fornecedor</span><span class="amt neg">-R$ 40,00</span></div>
+          <div class="mock-row"><span class="ic"><i data-lucide="arrow-down-circle"></i></span><span class="name">Venda Pix</span><span class="amt">+R$ 65,00</span></div>
+        </div>
+        <div class="mock-total-row"><span>Saldo atual</span><span>R$ 850,00</span></div>
+      </div>
+      <div class="mock-card mini">
+        <div class="mock-topbar"><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-title">ESTOQUE</span></div>
+        <div class="mock-stock-list">
+          <div class="mock-stock-row"><span>Camiseta P</span><span class="badge ok">32 un.</span></div>
+          <div class="mock-stock-row"><span>Caneca Azul</span><span class="badge warn">3 un.</span></div>
+          <div class="mock-stock-row"><span>Boné Preto</span><span class="badge ok">18 un.</span></div>
+          <div class="mock-stock-row"><span>Chaveiro</span><span class="badge danger">0 un.</span></div>
+        </div>
+      </div>
+      <div class="mock-card mini">
+        <div class="mock-topbar"><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-title">NOVA VENDA</span></div>
+        <div class="mock-cart">
+          <div class="mock-cart-row"><span>2x Camiseta P</span><span>R$ 60,00</span></div>
+          <div class="mock-cart-row"><span>1x Boné Preto</span><span>R$ 35,00</span></div>
+        </div>
+        <div class="mock-total-row"><span>Total</span><span>R$ 95,00</span></div>
+      </div>
+      <div class="mock-card mini">
+        <div class="mock-topbar"><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-title">DRE — MÊS</span></div>
+        <div class="mock-chart" style="height:60px;">
+          <div class="mock-bar" style="height:40%"></div><div class="mock-bar" style="height:65%"></div><div class="mock-bar" style="height:50%"></div><div class="mock-bar" style="height:80%"></div><div class="mock-bar" style="height:60%"></div>
+        </div>
+        <div class="mock-total-row"><span>Lucro líquido</span><span class="pos">R$ 1.240,00</span></div>
+      </div>
     </div>
   </div>
 </section>
