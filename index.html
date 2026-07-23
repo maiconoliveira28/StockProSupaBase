@@ -131,7 +131,8 @@ i[data-lucide],svg.lucide{width:18px;height:18px;stroke-width:2;flex-shrink:0;}
 
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:1.5rem;}
 .card{background:var(--surface);border-radius:var(--radius);padding:1.1rem 1.2rem;box-shadow:var(--shadow);border:1px solid var(--border);}
-.card-icon{width:8px;height:8px;border-radius:3px;margin-bottom:10px;}
+.card-icon{width:36px;height:36px;border-radius:10px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;}
+.card-icon i{width:18px;height:18px;color:#fff;}
 .card-icon.blue{background:var(--blue);}.card-icon.green{background:var(--green);}.card-icon.red{background:var(--red);}.card-icon.purple{background:var(--primary);}.card-icon.orange{background:var(--orange);}
 .card-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;}
 .card-value{font-size:22px;font-weight:700;}
@@ -272,6 +273,12 @@ input[type="checkbox"]{accent-color:var(--red);}
   table{font-size:12px;}
   .cards{grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;}
   .card{padding:0.85rem 0.9rem;}
+  .painel-hero{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+  .hero-card{padding:0.9rem 1rem;}
+  .hero-value{font-size:16px;}
+  .painel-chart-card{padding:1rem 1.1rem;}
+  .stat-cards{grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;}
+  .stat-card{padding:0.85rem 0.9rem;}
   .page-title-h{font-size:16px;}
   #page-title-actions{width:100%;}
   #page-title-actions .search-wrap{width:100%;}
@@ -315,6 +322,42 @@ input[type="checkbox"]{accent-color:var(--red);}
 .carousel-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.35);cursor:pointer;transition:all .2s;}
 .carousel-dot.active{background:#fff;width:20px;border-radius:4px;}
 @media(max-width:767px){.auth-showcase{display:none;}}
+.painel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+.painel-greeting{font-size:21px;font-weight:800;color:var(--text);margin-bottom:2px;}
+.painel-sub{font-size:13px;color:var(--text2);text-transform:capitalize;}
+.painel-hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:1.25rem;}
+.hero-card{position:relative;overflow:hidden;border-radius:16px;padding:1.3rem 1.4rem;color:#fff;display:flex;flex-direction:column;gap:16px;box-shadow:0 10px 24px rgba(15,23,42,0.14);}
+.hero-card::after{content:'';position:absolute;top:-34px;right:-34px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,0.13);pointer-events:none;}
+.hero-card.grad-green{background:linear-gradient(135deg,#10b981,#059669);}
+.hero-card.grad-blue{background:linear-gradient(135deg,#3b82f6,#2563eb);}
+.hero-card.grad-orange{background:linear-gradient(135deg,#f97316,#ea580c);}
+.hero-card.grad-purple{background:linear-gradient(135deg,#8b5cf6,#7c3aed);}
+.hero-card.grad-red{background:linear-gradient(135deg,#f87171,#dc2626);}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:1;}
+.hero-label{font-size:13px;font-weight:600;color:rgba(255,255,255,0.92);}
+.hero-ic{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.hero-ic i{width:19px;height:19px;color:#fff;}
+.hero-value{font-size:25px;font-weight:800;position:relative;z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hero-trend{font-size:12px;color:rgba(255,255,255,0.88);display:flex;align-items:center;gap:5px;position:relative;z-index:1;}
+.hero-trend i{width:13px;height:13px;flex-shrink:0;}
+.painel-chart-card{background:var(--surface);border-radius:var(--radius);padding:1.25rem 1.4rem;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:1.25rem;}
+.painel-chart-title{font-size:12.5px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.03em;margin-bottom:16px;}
+.painel-chart-bars{display:flex;align-items:flex-end;gap:10px;height:120px;}
+.painel-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px;}
+.painel-bar-val{font-size:10.5px;font-weight:700;color:var(--text2);}
+.painel-bar{width:100%;max-width:34px;background:linear-gradient(180deg,#6FA0EC,var(--primary));border-radius:6px 6px 2px 2px;min-height:4px;}
+.painel-bar-label{font-size:10.5px;color:var(--text3);font-weight:600;}
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:1.5rem;}
+.stat-card{background:var(--surface);border-radius:var(--radius);padding:1.1rem 1.2rem;box-shadow:var(--shadow);border:1px solid var(--border);}
+.stat-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.stat-icon i{width:16px;height:16px;}
+.stat-icon.blue{background:var(--primary-light);}.stat-icon.blue i{color:var(--primary);}
+.stat-icon.green{background:var(--green-light);}.stat-icon.green i{color:var(--green);}
+.stat-icon.red{background:var(--red-light);}.stat-icon.red i{color:var(--red);}
+.stat-icon.orange{background:var(--orange-light);}.stat-icon.orange i{color:var(--orange);}
+.stat-icon.purple{background:var(--primary-light);}.stat-icon.purple i{color:var(--primary-dark);}
+.stat-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;}
+.stat-value{font-size:20px;font-weight:700;}
 </style>
 </head>
 <body>
@@ -599,13 +642,24 @@ input[type="checkbox"]{accent-color:var(--red);}
       </div>
       <!-- PAINEL -->
       <div id="tab-painel" class="section active">
+        <div class="painel-header">
+          <div>
+            <h2 class="painel-greeting" id="painel-saudacao">Olá!</h2>
+            <p class="painel-sub" id="painel-data-hoje"></p>
+          </div>
+        </div>
         <div id="mei-alerta-das" class="feedback err" style="display:none;font-size:14px"></div>
         <div id="mei-alerta-fat" class="feedback err" style="display:none;background:var(--orange-light);color:#92400e;border-color:#fcd34d;font-size:14px"></div>
         <div id="pl-alerta-sobra" class="feedback err" style="display:none;font-size:14px"></div>
         <div id="pl-alerta-despesas" class="feedback" style="display:none;background:var(--orange-light);color:#92400e;border-color:#fcd34d;font-size:14px"></div>
         <div id="pl-alerta-caiu" class="feedback" style="display:none;background:#fef9c3;color:#854d0e;border-color:#fde047;font-size:14px"></div>
         <div id="pl-alerta-nao-registrado" class="feedback" style="display:none;background:var(--blue-light);color:#1e40af;border-color:#93c5fd;font-size:14px"></div>
-        <div class="cards" id="summary-cards"></div>
+        <div class="painel-hero" id="painel-hero"></div>
+        <div class="painel-chart-card">
+          <div class="painel-chart-title">Vendas dos últimos 7 dias</div>
+          <div class="painel-chart-bars" id="painel-chart-bars"></div>
+        </div>
+        <div class="stat-cards" id="summary-cards"></div>
         <div class="sec-header">Alertas de estoque</div>
         <div class="table-wrap"><div id="alert-list"></div></div>
       </div>
@@ -1813,22 +1867,44 @@ input[type="checkbox"]{accent-color:var(--red);}
     var plDiag=calcularDiagnosticoMesPL(mesAtualKey);
     var plSugestao=Math.max(plDiag.sobra,0)*0.5;
     var plValorCard=plRegistrado?plRegistrado.valor:plSugestao;
+
+    var nomeSaud=(usuarioAtual&&usuarioAtual.nome)?usuarioAtual.nome.split(' ')[0]:'';
+    document.getElementById('painel-saudacao').textContent='Olá'+(nomeSaud?', '+nomeSaud:'')+'!';
+    document.getElementById('painel-data-hoje').textContent=hojeD.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+
+    document.getElementById('painel-hero').innerHTML=
+      '<div class="hero-card grad-green"><div class="hero-top"><span class="hero-label">Vendas hoje</span><div class="hero-ic"><i data-lucide="shopping-cart"></i></div></div><div class="hero-value">'+brl(totHoje)+'</div><div class="hero-trend"><i data-lucide="trending-up"></i> Total vendido hoje</div></div>'+
+      '<div class="hero-card '+(plRegistrado?'grad-blue':'grad-orange')+'"><div class="hero-top"><span class="hero-label">Pró-labore do mês'+(plRegistrado?'':' (sugestão)')+'</span><div class="hero-ic"><i data-lucide="wallet"></i></div></div><div class="hero-value">'+brl(plValorCard)+'</div><div class="hero-trend"><i data-lucide="'+(plRegistrado?'check-circle':'lightbulb')+'"></i> '+(plRegistrado?'Já registrado este mês':'Com base na sobra do mês')+'</div></div>'+
+      '<div class="hero-card grad-purple"><div class="hero-top"><span class="hero-label">Valor em estoque</span><div class="hero-ic"><i data-lucide="package"></i></div></div><div class="hero-value">'+brl(valor)+'</div><div class="hero-trend"><i data-lucide="box"></i> Valor investido em produtos</div></div>'+
+      '<div class="hero-card '+(totalFiadoAberto>0?'grad-red':'grad-green')+'"><div class="hero-top"><span class="hero-label">Fiado em aberto</span><div class="hero-ic"><i data-lucide="credit-card"></i></div></div><div class="hero-value">'+brl(totalFiadoAberto)+'</div><div class="hero-trend"><i data-lucide="'+(totalFiadoAberto>0?'clock':'check-circle')+'"></i> '+(totalFiadoAberto>0?'Aguardando recebimento':'Nenhum fiado em aberto')+'</div></div>';
+
+    var dias7=[];
+    for(var di=6;di>=0;di--){
+      var dD=new Date();dD.setDate(dD.getDate()-di);
+      var lblCompleto=String(dD.getDate()).padStart(2,'0')+'/'+String(dD.getMonth()+1).padStart(2,'0')+'/'+dD.getFullYear();
+      var lblCurto=String(dD.getDate()).padStart(2,'0')+'/'+String(dD.getMonth()+1).padStart(2,'0');
+      var totDia=vs.filter(function(v){return v.data.indexOf(lblCompleto)===0;}).reduce(function(s,v){return s+v.total;},0);
+      dias7.push({lbl:lblCurto,tot:totDia});
+    }
+    var maxDia=Math.max.apply(null,dias7.map(function(d){return d.tot;}))||1;
+    document.getElementById('painel-chart-bars').innerHTML=dias7.map(function(d){
+      var h=Math.max((d.tot/maxDia)*100,d.tot>0?6:2);
+      return '<div class="painel-bar-wrap"><div class="painel-bar-val">'+(d.tot>0?brl(d.tot).replace('R$ ',''):'')+'</div><div class="painel-bar" style="height:'+h+'%"></div><div class="painel-bar-label">'+d.lbl+'</div></div>';
+    }).join('');
+
     document.getElementById('summary-cards').innerHTML=
-      '<div class="card"><div class="card-icon '+(plRegistrado?'green':'orange')+'"></div><div class="card-label">Pró-labore do mês'+(plRegistrado?'':' (sugestão)')+'</div><div class="card-value" style="font-size:16px">'+brl(plValorCard)+'</div></div>'+
-      '<div class="card"><div class="card-icon blue"></div><div class="card-label">Produtos</div><div class="card-value">'+total+'</div></div>'+
-      '<div class="card"><div class="card-icon orange"></div><div class="card-label">Estoque baixo</div><div class="card-value">'+baixo+'</div></div>'+
-      '<div class="card"><div class="card-icon red"></div><div class="card-label">Esgotados</div><div class="card-value">'+esgotado+'</div></div>'+
-      '<div class="card"><div class="card-icon purple"></div><div class="card-label">Valor estoque</div><div class="card-value" style="font-size:16px">'+brl(valor)+'</div></div>'+
-      '<div class="card"><div class="card-icon green"></div><div class="card-label">Vendas hoje</div><div class="card-value" style="font-size:16px">'+brl(totHoje)+'</div></div>'+
-      '<div class="card"><div class="card-icon blue"></div><div class="card-label">Clientes</div><div class="card-value">'+dados.clientes.length+'</div></div>'+
-      '<div class="card"><div class="card-icon '+(totalFiadoAberto>0?'red':'green')+'"></div><div class="card-label">Fiado em aberto</div><div class="card-value" style="font-size:16px;color:'+(totalFiadoAberto>0?'var(--red)':'var(--text)')+'">'+brl(totalFiadoAberto)+'</div></div>'+
+      '<div class="stat-card"><div class="stat-icon blue"><i data-lucide="box"></i></div><div class="stat-label">Produtos</div><div class="stat-value">'+total+'</div></div>'+
+      '<div class="stat-card"><div class="stat-icon orange"><i data-lucide="alert-triangle"></i></div><div class="stat-label">Estoque baixo</div><div class="stat-value">'+baixo+'</div></div>'+
+      '<div class="stat-card"><div class="stat-icon red"><i data-lucide="x-circle"></i></div><div class="stat-label">Esgotados</div><div class="stat-value">'+esgotado+'</div></div>'+
+      '<div class="stat-card"><div class="stat-icon blue"><i data-lucide="users"></i></div><div class="stat-label">Clientes</div><div class="stat-value">'+dados.clientes.length+'</div></div>'+
       (metaAtual?(
-      '<div class="card" style="grid-column:span 2"><div class="card-icon '+(pctMeta>=100?'green':pctMeta>=70?'orange':'red')+'"></div><div class="card-label">Meta do mês</div><div class="card-value" style="font-size:16px">'+brl(fatMesAtual)+' <span style="color:var(--text3);font-weight:600;font-size:12px">/ '+brl(metaAtual.valor)+' ('+pctMeta.toFixed(0)+'%)</span></div><div class="pts-bar" style="margin-top:8px;height:6px"><div class="pts-bar-fill" style="width:'+Math.min(pctMeta,100)+'%;background:'+(pctMeta>=100?'var(--green)':pctMeta>=70?'var(--orange)':'var(--red)')+'"></div></div></div>'
+      '<div class="stat-card" style="grid-column:span 2"><div class="stat-icon '+(pctMeta>=100?'green':pctMeta>=70?'orange':'red')+'"><i data-lucide="target"></i></div><div class="stat-label">Meta do mês</div><div class="stat-value" style="font-size:16px">'+brl(fatMesAtual)+' <span style="color:var(--text3);font-weight:600;font-size:12px">/ '+brl(metaAtual.valor)+' ('+pctMeta.toFixed(0)+'%)</span></div><div class="pts-bar" style="margin-top:8px;height:6px"><div class="pts-bar-fill" style="width:'+Math.min(pctMeta,100)+'%;background:'+(pctMeta>=100?'var(--green)':pctMeta>=70?'var(--orange)':'var(--red)')+'"></div></div></div>'
       ):'')+
       (meiAtivo?(
-      '<div class="card" style="grid-column:span 2"><div class="card-icon '+(pctMei>90?'red':pctMei>70?'orange':'purple')+'"></div><div class="card-label">Faturamento do ano (MEI)</div><div class="card-value" style="font-size:16px">'+brl(fatAno)+' <span style="color:var(--text3);font-weight:600;font-size:12px">/ '+brl(limiteMei)+'</span></div><div class="pts-bar" style="margin-top:8px;height:6px"><div class="pts-bar-fill" style="width:'+Math.min(pctMei,100)+'%;background:'+(pctMei>90?'var(--red)':pctMei>70?'var(--orange)':'linear-gradient(90deg,#f59e0b,#fbbf24)')+'"></div></div></div>'+
-      '<div class="card"><div class="card-icon '+(dasPagoMes?'green':'red')+'"></div><div class="card-label">DAS do mês</div><div class="card-value" style="font-size:16px;color:'+(dasPagoMes?'var(--green)':'var(--red)')+'">'+(dasPagoMes?'Pago':'Pendente')+'</div></div>'
+      '<div class="stat-card" style="grid-column:span 2"><div class="stat-icon '+(pctMei>90?'red':pctMei>70?'orange':'purple')+'"><i data-lucide="trending-up"></i></div><div class="stat-label">Faturamento do ano (MEI)</div><div class="stat-value" style="font-size:16px">'+brl(fatAno)+' <span style="color:var(--text3);font-weight:600;font-size:12px">/ '+brl(limiteMei)+'</span></div><div class="pts-bar" style="margin-top:8px;height:6px"><div class="pts-bar-fill" style="width:'+Math.min(pctMei,100)+'%;background:'+(pctMei>90?'var(--red)':pctMei>70?'var(--orange)':'linear-gradient(90deg,#f59e0b,#fbbf24)')+'"></div></div></div>'+
+      '<div class="stat-card"><div class="stat-icon '+(dasPagoMes?'green':'red')+'"><i data-lucide="file-text"></i></div><div class="stat-label">DAS do mês</div><div class="stat-value" style="font-size:16px;color:'+(dasPagoMes?'var(--green)':'var(--red)')+'">'+(dasPagoMes?'Pago':'Pendente')+'</div></div>'
       ):'');
+    if(window.lucide)lucide.createIcons();
     var alertas=ps.filter(function(p){return p.qty<=p.min;});
     atualizarBadgeNotificacoes();
     document.getElementById('alert-list').innerHTML=!alertas.length
@@ -2380,11 +2456,12 @@ input[type="checkbox"]{accent-color:var(--red);}
     var ent=movs.filter(function(m){return m.tipo==='entrada';}).reduce(function(s,m){return s+m.valor;},0);
     var sai=movs.filter(function(m){return m.tipo==='saida';}).reduce(function(s,m){return s+m.valor;},0);
     document.getElementById('caixa-cards').innerHTML=
-      '<div class="card"><div class="card-icon green"></div><div class="card-label">Saldo inicial</div><div class="card-value" style="font-size:18px">'+brl(caixa.saldoInicial)+'</div></div>'+
-      '<div class="card"><div class="card-icon green"></div><div class="card-label">Total entradas</div><div class="card-value" style="font-size:18px">'+brl(ent)+'</div></div>'+
-      '<div class="card"><div class="card-icon red"></div><div class="card-label">Total saídas</div><div class="card-value" style="font-size:18px">'+brl(sai)+'</div></div>'+
-      '<div class="card"><div class="card-icon purple"></div><div class="card-label">Saldo atual</div><div class="card-value" style="font-size:18px">'+brl(caixa.saldoInicial+ent-sai)+'</div></div>'+
-      '<div class="card"><div class="card-icon blue"></div><div class="card-label">Abertura</div><div class="card-value" style="font-size:12px;margin-top:4px">'+caixa.dataAbertura+'</div></div>';
+      '<div class="card"><div class="card-icon green"><i data-lucide="wallet"></i></div><div class="card-label">Saldo inicial</div><div class="card-value" style="font-size:18px">'+brl(caixa.saldoInicial)+'</div></div>'+
+      '<div class="card"><div class="card-icon green"><i data-lucide="arrow-down-circle"></i></div><div class="card-label">Total entradas</div><div class="card-value" style="font-size:18px">'+brl(ent)+'</div></div>'+
+      '<div class="card"><div class="card-icon red"><i data-lucide="arrow-up-circle"></i></div><div class="card-label">Total saídas</div><div class="card-value" style="font-size:18px">'+brl(sai)+'</div></div>'+
+      '<div class="card"><div class="card-icon purple"><i data-lucide="dollar-sign"></i></div><div class="card-label">Saldo atual</div><div class="card-value" style="font-size:18px">'+brl(caixa.saldoInicial+ent-sai)+'</div></div>'+
+      '<div class="card"><div class="card-icon blue"><i data-lucide="clock"></i></div><div class="card-label">Abertura</div><div class="card-value" style="font-size:12px;margin-top:4px">'+caixa.dataAbertura+'</div></div>';
+    if(window.lucide)lucide.createIcons();
     var tb=document.getElementById('caixa-movs');
     if(!movs.length){tb.innerHTML='<tr><td colspan="6"><div class="empty" style="padding:1rem">Nenhuma movimentação ainda</div></td></tr>';return;}
     tb.innerHTML=movs.slice().reverse().map(function(m){return '<tr><td style="font-size:12px;color:var(--text2)">'+(m.data||'—')+'</td><td style="font-size:12px;color:var(--text2)">'+m.hora+'</td><td>'+m.descricao+'</td><td style="font-size:12px">'+(m.categoria||'—')+'</td><td><span class="badge '+(m.tipo==='entrada'?'ok':'low')+'">'+(m.tipo==='entrada'?'Entrada':'Saída')+'</span></td><td style="font-weight:700;color:'+(m.tipo==='entrada'?'var(--green)':'var(--red)')+'">'+(m.tipo==='entrada'?'+':'-')+brl(m.valor)+'</td></tr>';}).join('');
@@ -2492,10 +2569,11 @@ input[type="checkbox"]{accent-color:var(--red);}
     var maiorDespesa=saidas.reduce(function(max,m){return(!max||m.valor>max.valor)?m:max;},null);
 
     document.getElementById('fluxo-cards').innerHTML=
-      '<div class="card"><div class="card-icon green"></div><div class="card-label">Total entradas</div><div class="card-value" style="font-size:18px;color:var(--green)">'+brl(totEnt)+'</div></div>'+
-      '<div class="card"><div class="card-icon red"></div><div class="card-label">Total saídas</div><div class="card-value" style="font-size:18px;color:var(--red)">'+brl(totSai)+'</div></div>'+
-      '<div class="card"><div class="card-icon '+(saldoPeriodo>=0?'green':'red')+'"></div><div class="card-label">Saldo do período</div><div class="card-value" style="font-size:18px;color:'+(saldoPeriodo>=0?'var(--green)':'var(--red)')+'">'+brl(saldoPeriodo)+'</div></div>'+
-      '<div class="card"><div class="card-icon orange"></div><div class="card-label">Maior despesa</div><div class="card-value" style="font-size:14px">'+(maiorDespesa?brl(maiorDespesa.valor)+' — '+maiorDespesa.descricao:'—')+'</div></div>';
+      '<div class="card"><div class="card-icon green"><i data-lucide="arrow-down-circle"></i></div><div class="card-label">Total entradas</div><div class="card-value" style="font-size:18px;color:var(--green)">'+brl(totEnt)+'</div></div>'+
+      '<div class="card"><div class="card-icon red"><i data-lucide="arrow-up-circle"></i></div><div class="card-label">Total saídas</div><div class="card-value" style="font-size:18px;color:var(--red)">'+brl(totSai)+'</div></div>'+
+      '<div class="card"><div class="card-icon '+(saldoPeriodo>=0?'green':'red')+'"><i data-lucide="trending-up"></i></div><div class="card-label">Saldo do período</div><div class="card-value" style="font-size:18px;color:'+(saldoPeriodo>=0?'var(--green)':'var(--red)')+'">'+brl(saldoPeriodo)+'</div></div>'+
+      '<div class="card"><div class="card-icon orange"><i data-lucide="alert-triangle"></i></div><div class="card-label">Maior despesa</div><div class="card-value" style="font-size:14px">'+(maiorDespesa?brl(maiorDespesa.valor)+' — '+maiorDespesa.descricao:'—')+'</div></div>';
+    if(window.lucide)lucide.createIcons();
 
     var diffDias=Math.round((ateD-deD)/86400000)+1;
     var agruparPorSemana=diffDias>45;
@@ -2586,12 +2664,13 @@ input[type="checkbox"]{accent-color:var(--red);}
     if(!vP.length&&!eP.length){res.style.display='none';vaz.style.display='block';return;}
     vaz.style.display='none';res.style.display='block';
     document.getElementById('r-cards').innerHTML=
-      '<div class="card"><div class="card-icon green"></div><div class="card-label">Vendas</div><div class="card-value">'+vP.length+'</div></div>'+
-      '<div class="card"><div class="card-icon blue"></div><div class="card-label">Itens</div><div class="card-value">'+qtdIt+'</div></div>'+
-      '<div class="card"><div class="card-icon purple"></div><div class="card-label">Receita</div><div class="card-value" style="font-size:16px">'+brl(totV)+'</div></div>'+
-      '<div class="card"><div class="card-icon red"></div><div class="card-label">Devoluções</div><div class="card-value" style="font-size:16px">'+brl(totDev)+'</div></div>'+
-      '<div class="card"><div class="card-icon green"></div><div class="card-label">Lucro</div><div class="card-value" style="font-size:16px">'+brl(lucro)+'</div></div>'+
-      '<div class="card"><div class="card-icon orange"></div><div class="card-label">Entradas</div><div class="card-value">'+eP.length+'</div></div>';
+      '<div class="card"><div class="card-icon green"><i data-lucide="shopping-cart"></i></div><div class="card-label">Vendas</div><div class="card-value">'+vP.length+'</div></div>'+
+      '<div class="card"><div class="card-icon blue"><i data-lucide="box"></i></div><div class="card-label">Itens</div><div class="card-value">'+qtdIt+'</div></div>'+
+      '<div class="card"><div class="card-icon purple"><i data-lucide="dollar-sign"></i></div><div class="card-label">Receita</div><div class="card-value" style="font-size:16px">'+brl(totV)+'</div></div>'+
+      '<div class="card"><div class="card-icon red"><i data-lucide="rotate-ccw"></i></div><div class="card-label">Devoluções</div><div class="card-value" style="font-size:16px">'+brl(totDev)+'</div></div>'+
+      '<div class="card"><div class="card-icon green"><i data-lucide="trending-up"></i></div><div class="card-label">Lucro</div><div class="card-value" style="font-size:16px">'+brl(lucro)+'</div></div>'+
+      '<div class="card"><div class="card-icon orange"><i data-lucide="package"></i></div><div class="card-label">Entradas</div><div class="card-value">'+eP.length+'</div></div>';
+    if(window.lucide)lucide.createIcons();
     var marg=totV>0?(lucro/totV*100).toFixed(1):0;
     document.getElementById('dre-corpo').innerHTML=
       '<div class="dre-row"><span>Receita Bruta</span><span>'+brl(totV)+'</span></div>'+
@@ -2656,9 +2735,10 @@ input[type="checkbox"]{accent-color:var(--red);}
     }).join('');
     var totT=dm.reduce(function(s,m){return s+m.total;},0),totL=dm.reduce(function(s,m){return s+m.lucro;},0),totQ=dm.reduce(function(s,m){return s+m.qtd;},0);
     document.getElementById('mensal-cards').innerHTML=
-      '<div class="card"><div class="card-icon green"></div><div class="card-label">Receita 6 meses</div><div class="card-value" style="font-size:17px">'+brl(totT)+'</div></div>'+
-      '<div class="card"><div class="card-icon purple"></div><div class="card-label">Lucro 6 meses</div><div class="card-value" style="font-size:17px">'+brl(totL)+'</div></div>'+
-      '<div class="card"><div class="card-icon blue"></div><div class="card-label">Vendas 6 meses</div><div class="card-value">'+totQ+'</div></div>';
+      '<div class="card"><div class="card-icon green"><i data-lucide="bar-chart-3"></i></div><div class="card-label">Receita 6 meses</div><div class="card-value" style="font-size:17px">'+brl(totT)+'</div></div>'+
+      '<div class="card"><div class="card-icon purple"><i data-lucide="trending-up"></i></div><div class="card-label">Lucro 6 meses</div><div class="card-value" style="font-size:17px">'+brl(totL)+'</div></div>'+
+      '<div class="card"><div class="card-icon blue"><i data-lucide="shopping-cart"></i></div><div class="card-label">Vendas 6 meses</div><div class="card-value">'+totQ+'</div></div>';
+    if(window.lucide)lucide.createIcons();
     var rankCli=dados.clientes.map(function(c){
       var compras=dados.vendas.filter(function(v){return v.clienteId===c.id;});
       var total=compras.reduce(function(s,v){return s+v.total;},0);
@@ -3147,13 +3227,14 @@ input[type="checkbox"]{accent-color:var(--red);}
     var diag=calcularDiagnosticoMesPL(sel.value);
     var sobraCor=diag.sobra>=0?'green':'red';
     document.getElementById('pl-diag-cards').innerHTML=
-      '<div class="card"><div class="card-icon green"></div><div class="card-label">Receita bruta</div><div class="card-value" style="font-size:16px">'+brl(diag.receita)+'</div></div>'+
-      '<div class="card"><div class="card-icon red"></div><div class="card-label">Custo dos produtos (CMV)</div><div class="card-value" style="font-size:16px">'+brl(diag.cmv)+'</div></div>'+
-      '<div class="card"><div class="card-icon red"></div><div class="card-label">Despesas fixas</div><div class="card-value" style="font-size:16px">'+brl(diag.despesas)+'</div></div>'+
-      '<div class="card"><div class="card-icon red"></div><div class="card-label">DAS MEI</div><div class="card-value" style="font-size:16px">'+brl(diag.das)+'</div></div>'+
-      '<div class="card"><div class="card-icon orange"></div><div class="card-label">Reserva de estoque ('+diag.cfg.reservaEstoque+'%)</div><div class="card-value" style="font-size:16px">'+brl(diag.reservaEstoqueValor)+'</div></div>'+
-      '<div class="card"><div class="card-icon orange"></div><div class="card-label">Reserva de emergência ('+diag.cfg.reservaEmergencia+'%)</div><div class="card-value" style="font-size:16px">'+brl(diag.reservaEmergenciaValor)+'</div></div>'+
-      '<div class="card" style="grid-column:span 2"><div class="card-icon '+sobraCor+'"></div><div class="card-label">Sobra disponível</div><div class="card-value" style="font-size:20px;color:var(--'+sobraCor+')">'+brl(diag.sobra)+'</div></div>';
+      '<div class="card"><div class="card-icon green"><i data-lucide="trending-up"></i></div><div class="card-label">Receita bruta</div><div class="card-value" style="font-size:16px">'+brl(diag.receita)+'</div></div>'+
+      '<div class="card"><div class="card-icon red"><i data-lucide="package"></i></div><div class="card-label">Custo dos produtos (CMV)</div><div class="card-value" style="font-size:16px">'+brl(diag.cmv)+'</div></div>'+
+      '<div class="card"><div class="card-icon red"><i data-lucide="receipt"></i></div><div class="card-label">Despesas fixas</div><div class="card-value" style="font-size:16px">'+brl(diag.despesas)+'</div></div>'+
+      '<div class="card"><div class="card-icon red"><i data-lucide="file-text"></i></div><div class="card-label">DAS MEI</div><div class="card-value" style="font-size:16px">'+brl(diag.das)+'</div></div>'+
+      '<div class="card"><div class="card-icon orange"><i data-lucide="shield"></i></div><div class="card-label">Reserva de estoque ('+diag.cfg.reservaEstoque+'%)</div><div class="card-value" style="font-size:16px">'+brl(diag.reservaEstoqueValor)+'</div></div>'+
+      '<div class="card"><div class="card-icon orange"><i data-lucide="shield-check"></i></div><div class="card-label">Reserva de emergência ('+diag.cfg.reservaEmergencia+'%)</div><div class="card-value" style="font-size:16px">'+brl(diag.reservaEmergenciaValor)+'</div></div>'+
+      '<div class="card" style="grid-column:span 2"><div class="card-icon '+sobraCor+'"><i data-lucide="wallet"></i></div><div class="card-label">Sobra disponível</div><div class="card-value" style="font-size:20px;color:var(--'+sobraCor+')">'+brl(diag.sobra)+'</div></div>';
+    if(window.lucide)lucide.createIcons();
 
     var sobraPositiva=Math.max(diag.sobra,0);
     var vConservador=sobraPositiva*0.3,vModerado=sobraPositiva*0.5,vArrojado=sobraPositiva*0.7;
@@ -3249,8 +3330,9 @@ input[type="checkbox"]{accent-color:var(--red);}
     var anoAtual=new Date().getFullYear();
     var totalAno=dados.prolabore.filter(function(p){return parseInt(p.mes.split('-')[0])===anoAtual;}).reduce(function(s,p){return s+p.valor;},0);
     document.getElementById('pl-hist-cards').innerHTML=
-      '<div class="card"><div class="card-icon purple"></div><div class="card-label">Total retirado em '+anoAtual+'</div><div class="card-value" style="font-size:17px">'+brl(totalAno)+'</div></div>'+
-      '<div class="card"><div class="card-icon blue"></div><div class="card-label">Meses registrados</div><div class="card-value">'+dados.prolabore.length+'</div></div>';
+      '<div class="card"><div class="card-icon purple"><i data-lucide="banknote"></i></div><div class="card-label">Total retirado em '+anoAtual+'</div><div class="card-value" style="font-size:17px">'+brl(totalAno)+'</div></div>'+
+      '<div class="card"><div class="card-icon blue"><i data-lucide="calendar"></i></div><div class="card-label">Meses registrados</div><div class="card-value">'+dados.prolabore.length+'</div></div>';
+    if(window.lucide)lucide.createIcons();
   }
 
   // ── CONFIGURAÇÕES ─────────────────────────────────────
