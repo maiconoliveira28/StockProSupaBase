@@ -1,6 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/", "has": [{ "type": "host", "value": "stockmei.com.br" }], "destination": "/landing.html" },
-    { "source": "/", "has": [{ "type": "host", "value": "www.stockmei.com.br" }], "destination": "/landing.html" }
-  ]
-}
